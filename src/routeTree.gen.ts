@@ -10,33 +10,135 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BookRouteImport } from './routes/book'
+import { Route as ChatRouteImport } from './routes/chat'
+import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as NoorRouteImport } from './routes/noor'
+import { Route as NoorIndexRouteImport } from './routes/noor.index'
+import { Route as NoorBookingsRouteImport } from './routes/noor.bookings'
+import { Route as NoorInboxRouteImport } from './routes/noor.inbox'
+import { Route as NoorInsightsRouteImport } from './routes/noor.insights'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BookRoute = BookRouteImport.update({
+  id: '/book',
+  path: '/book',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NoorRoute = NoorRouteImport.update({
+  id: '/noor',
+  path: '/noor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NoorIndexRoute = NoorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NoorRoute,
+} as any)
+const NoorBookingsRoute = NoorBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => NoorRoute,
+} as any)
+const NoorInboxRoute = NoorInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => NoorRoute,
+} as any)
+const NoorInsightsRoute = NoorInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => NoorRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/book': typeof BookRoute
+  '/chat': typeof ChatRoute
+  '/feedback': typeof FeedbackRoute
+  '/noor': typeof NoorRouteWithChildren
+  '/noor/bookings': typeof NoorBookingsRoute
+  '/noor/inbox': typeof NoorInboxRoute
+  '/noor/insights': typeof NoorInsightsRoute
+  '/noor/': typeof NoorIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/book': typeof BookRoute
+  '/chat': typeof ChatRoute
+  '/feedback': typeof FeedbackRoute
+  '/noor/bookings': typeof NoorBookingsRoute
+  '/noor/inbox': typeof NoorInboxRoute
+  '/noor/insights': typeof NoorInsightsRoute
+  '/noor': typeof NoorIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/book': typeof BookRoute
+  '/chat': typeof ChatRoute
+  '/feedback': typeof FeedbackRoute
+  '/noor': typeof NoorRouteWithChildren
+  '/noor/bookings': typeof NoorBookingsRoute
+  '/noor/inbox': typeof NoorInboxRoute
+  '/noor/insights': typeof NoorInsightsRoute
+  '/noor/': typeof NoorIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/book'
+    | '/chat'
+    | '/feedback'
+    | '/noor'
+    | '/noor/bookings'
+    | '/noor/inbox'
+    | '/noor/insights'
+    | '/noor/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/book'
+    | '/chat'
+    | '/feedback'
+    | '/noor/bookings'
+    | '/noor/inbox'
+    | '/noor/insights'
+    | '/noor'
+  id:
+    | '__root__'
+    | '/'
+    | '/book'
+    | '/chat'
+    | '/feedback'
+    | '/noor'
+    | '/noor/bookings'
+    | '/noor/inbox'
+    | '/noor/insights'
+    | '/noor/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BookRoute: typeof BookRoute
+  ChatRoute: typeof ChatRoute
+  FeedbackRoute: typeof FeedbackRoute
+  NoorRoute: typeof NoorRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +150,87 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/book': {
+      id: '/book'
+      path: '/book'
+      fullPath: '/book'
+      preLoaderRoute: typeof BookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/noor': {
+      id: '/noor'
+      path: '/noor'
+      fullPath: '/noor'
+      preLoaderRoute: typeof NoorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/noor/': {
+      id: '/noor/'
+      path: '/'
+      fullPath: '/noor/'
+      preLoaderRoute: typeof NoorIndexRouteImport
+      parentRoute: typeof NoorRoute
+    }
+    '/noor/bookings': {
+      id: '/noor/bookings'
+      path: '/bookings'
+      fullPath: '/noor/bookings'
+      preLoaderRoute: typeof NoorBookingsRouteImport
+      parentRoute: typeof NoorRoute
+    }
+    '/noor/inbox': {
+      id: '/noor/inbox'
+      path: '/inbox'
+      fullPath: '/noor/inbox'
+      preLoaderRoute: typeof NoorInboxRouteImport
+      parentRoute: typeof NoorRoute
+    }
+    '/noor/insights': {
+      id: '/noor/insights'
+      path: '/insights'
+      fullPath: '/noor/insights'
+      preLoaderRoute: typeof NoorInsightsRouteImport
+      parentRoute: typeof NoorRoute
+    }
   }
 }
 
+interface NoorRouteChildren {
+  NoorBookingsRoute: typeof NoorBookingsRoute
+  NoorInboxRoute: typeof NoorInboxRoute
+  NoorInsightsRoute: typeof NoorInsightsRoute
+  NoorIndexRoute: typeof NoorIndexRoute
+}
+
+const NoorRouteChildren: NoorRouteChildren = {
+  NoorBookingsRoute: NoorBookingsRoute,
+  NoorInboxRoute: NoorInboxRoute,
+  NoorInsightsRoute: NoorInsightsRoute,
+  NoorIndexRoute: NoorIndexRoute,
+}
+
+const NoorRouteWithChildren = NoorRoute._addFileChildren(NoorRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BookRoute: BookRoute,
+  ChatRoute: ChatRoute,
+  FeedbackRoute: FeedbackRoute,
+  NoorRoute: NoorRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
