@@ -37,24 +37,20 @@ export const processVoice = createServerFn({ method: "POST" })
 
     const aiKey = process.env["LOVABLE_API_KEY"];
     if (!aiKey) return { ok: true as const, transcript, translated: "", error: "Translation unavailable." };
-    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const r = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
       headers: { Authorization: `Bearer ${aiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content: `Translate the user's message into ${data.targetLanguage}. Keep it warm and simple. Output only the translation.`,
-          },
-          { role: "user", content: transcript },
-        ],
+        model: "openai/gpt-6-astra",
+        instructions: `Translate the user's message into ${data.targetLanguage}. Keep it warm and simple. Output only the translation.`,
+        input: transcript,
       }),
     });
     if (!r.ok) {
       console.error("Translate failed", r.status, await r.text());
       return { ok: true as const, transcript, translated: "", error: `Translation failed (${r.status}).` };
     }
-    const j = (await r.json()) as { choices?: { message?: { content?: string } }[] };
-    return { ok: true as const, transcript, translated: j.choices?.[0]?.message?.content?.trim() ?? "" };
+    const j = (await r.json()) as { output_text?: string; output?: { content?: { text?: string }[] }[] };
+    const translated = j.output_text ?? j.output?.flatMap((o) => o.content ?? []).map((c) => c.text ?? "").join("") ?? "";
+    return { ok: true as const, transcript, translated: translated.trim() };
   });
