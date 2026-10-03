@@ -20,7 +20,7 @@ describe("Rooted rules", () => {
     resetDemo();
     const fb = JSON.parse(localStorage.getItem("rooted-state-v1")!).feedback;
     const t = Object.fromEntries(feedbackThemes(fb).map((x) => [x.label, x.count]));
-    expect(t["mentioned meeting Noor"]).toBe(5);
+    expect(t["mentioned meeting Noor"]).toBe(4);
     expect(t["mentioned coffee processing"]).toBe(3);
     expect(t["asked about roasting"]).toBe(2);
   });

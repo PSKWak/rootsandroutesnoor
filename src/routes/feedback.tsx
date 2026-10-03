@@ -41,7 +41,7 @@ function FeedbackPage() {
           onSubmit={(e) => {
             e.preventDefault();
             if (!rating) return;
-            submitFeedback({ rating, text: text || undefined, audio, tags });
+            submitFeedback({ rating, tags, ...(text ? { text } : {}), ...(audio ? { audio } : {}) });
             setDone(true);
           }}
         >

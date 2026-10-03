@@ -22,7 +22,7 @@ export const Route = createFileRoute("/book")({
 function Book() {
   const { exp } = Route.useSearch();
   const bookings = useStore((s) => s.bookings);
-  const [experienceId, setExp] = useState(exp ?? EXPERIENCES[0].id);
+  const [experienceId, setExp] = useState(exp ?? EXPERIENCES[0]!.id);
   const [date, setDate] = useState("");
   const [guests, setGuests] = useState(2);
 
