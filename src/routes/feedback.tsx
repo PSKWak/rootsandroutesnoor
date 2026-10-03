@@ -55,7 +55,7 @@ function FeedbackPage() {
           </div>
           <textarea value={text} onChange={(e) => setText(e.target.value)} rows={4} placeholder="What stayed with you?" className="w-full rounded-2xl border bg-card p-4" />
           <div className="space-y-2">
-            {audio ? <AudioPlayer src={audio} label="Your voice feedback" /> : <Recorder big label="Or record voice feedback" onDone={setAudio} />}
+            {audio ? <AudioPlayer src={audio} label="Your voice feedback" /> : <Recorder big label="Or record voice feedback" onDone={(a) => setAudio(a)} />}
           </div>
           <div className="flex flex-wrap gap-2">
             {FEEDBACK_TAGS.map((t) => {

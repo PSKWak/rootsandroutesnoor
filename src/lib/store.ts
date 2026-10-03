@@ -4,12 +4,12 @@ export type MsgStatus = "sent" | "delivered" | "waiting" | "review";
 export type Message = {
   id: string;
   from: "visitor" | "noor";
-  text?: string;
-  translated?: string;
-  audio?: string;
+  text?: string | undefined;
+  translated?: string | undefined;
+  audio?: string | undefined;
   status: MsgStatus;
   at: number;
-  heardByNoor?: boolean;
+  heardByNoor?: boolean | undefined;
 };
 export type BookingStatus = "requested" | "awaiting" | "confirmed" | "declined" | "alternative";
 export type Booking = {
@@ -18,14 +18,14 @@ export type Booking = {
   date: string;
   guests: number;
   status: BookingStatus;
-  altDate?: string;
+  altDate?: string | undefined;
   at: number;
 };
 export type Feedback = {
   id: string;
   rating: number;
-  text?: string;
-  audio?: string;
+  text?: string | undefined;
+  audio?: string | undefined;
   tags: string[];
   at: number;
 };
