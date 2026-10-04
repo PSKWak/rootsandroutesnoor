@@ -268,7 +268,7 @@ export function Reveal({ children, delay = 0, className = "", anim = "animate-ri
   );
 }
 
-/** Speaks short text (insights, prompts) in the given language via ElevenLabs. Labelled as a computer voice. */
+/** Speaks short text (insights, prompts) in the given language via Lovable AI. Labelled as a computer voice. */
 export function ListenButton({ text, language, big }: { text: string; language?: string; big?: boolean }) {
   const [state, setState] = useState<"idle" | "loading" | "error">("idle");
   return (

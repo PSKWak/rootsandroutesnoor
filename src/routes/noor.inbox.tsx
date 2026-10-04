@@ -1,18 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { AudioPlayer, MsgBadge, Recorder, Shell } from "@/components/rooted";
+import { AudioPlayer, ListenButton, MsgBadge, Recorder, Shell } from "@/components/rooted";
 import { approveTranslation, discardReply, retryMessage, markHeard, sendNoorReply, sendNoorText, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/noor/inbox")({
   head: () => ({ meta: [{ title: "Roots & Routes — Noor's Messages" }] }),
   component: Inbox,
 });
-
-/** Demo-only: speak the translated text so Noor can "listen" to typed messages. */
-function speak(text: string) {
-  const u = new SpeechSynthesisUtterance(text);
-  speechSynthesis.speak(u);
-}
 
 function Inbox() {
   const messages = useStore((s) => s.messages);
@@ -30,12 +24,10 @@ function Inbox() {
               {m.audio ? (
                 <AudioPlayer big src={m.audio} label="Listen" onPlay={() => markHeard(m.id)} />
               ) : (
-                <button onClick={() => { speak(m.translated ?? ""); markHeard(m.id); }} className="w-full rounded-full bg-secondary py-5 text-lg font-semibold text-secondary-foreground">
-                  ▶ Listen
-                </button>
+                m.translated ? <div onClickCapture={() => markHeard(m.id)}><ListenButton big text={m.translated} /></div> : null
               )}
               {m.translated && <p className="text-lg">{m.translated}</p>}
-              {m.translated && <p className="text-xs text-muted-foreground">Translated by AI into {lang}</p>}
+              {m.translated && <p className="text-xs text-muted-foreground">Translated by AI into {lang} · 🔊 read by AI voice</p>}
               <MsgBadge status={m.status} />
             </div>
           ) : (
