@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Shell } from "@/components/rooted";
 import { EXPERIENCES, requestPickup } from "@/lib/store";
-import { ACTIVITIES, CALENDAR, LOCATION, TERRAIN, TRANSPORT, monthsFor } from "@/lib/farm-info";
+import { ACTIVITIES, CALENDAR, FARM_SIZE, LOCATION, TERRAIN, TRANSPORT, monthsFor } from "@/lib/farm-info";
 
 export const Route = createFileRoute("/visit")({
   head: () => ({
@@ -94,6 +94,9 @@ function GettingHere() {
       <div className="mt-3 rounded-2xl border bg-card p-5 text-sm">
         <p>📍 Nearest town: {LOCATION.nearestTown}</p>
         <p className="mt-1">📍 Farm: {LOCATION.farm}</p>
+        <p className="mt-1">
+          🚶 On the farm: about {FARM_SIZE.walkingKm} km of walking across {FARM_SIZE.hectares} hectares.
+        </p>
       </div>
       <ul className="mt-3 space-y-2">
         {TRANSPORT.options.map((t) => (
