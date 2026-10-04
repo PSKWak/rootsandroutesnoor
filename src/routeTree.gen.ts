@@ -15,6 +15,7 @@ import { Route as ChatRouteImport } from './routes/chat'
 import { Route as ExperienceRouteImport } from './routes/experience'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as NoorRouteImport } from './routes/noor'
+import { Route as VisitRouteImport } from './routes/visit'
 import { Route as NoorIndexRouteImport } from './routes/noor.index'
 import { Route as NoorBookingsRouteImport } from './routes/noor.bookings'
 import { Route as NoorInboxRouteImport } from './routes/noor.inbox'
@@ -50,6 +51,11 @@ const NoorRoute = NoorRouteImport.update({
   path: '/noor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VisitRoute = VisitRouteImport.update({
+  id: '/visit',
+  path: '/visit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NoorIndexRoute = NoorIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/experience': typeof ExperienceRoute
   '/feedback': typeof FeedbackRoute
   '/noor': typeof NoorRouteWithChildren
+  '/visit': typeof VisitRoute
   '/noor/bookings': typeof NoorBookingsRoute
   '/noor/inbox': typeof NoorInboxRoute
   '/noor/insights': typeof NoorInsightsRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/experience': typeof ExperienceRoute
   '/feedback': typeof FeedbackRoute
+  '/visit': typeof VisitRoute
   '/noor/bookings': typeof NoorBookingsRoute
   '/noor/inbox': typeof NoorInboxRoute
   '/noor/insights': typeof NoorInsightsRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/experience': typeof ExperienceRoute
   '/feedback': typeof FeedbackRoute
   '/noor': typeof NoorRouteWithChildren
+  '/visit': typeof VisitRoute
   '/noor/bookings': typeof NoorBookingsRoute
   '/noor/inbox': typeof NoorInboxRoute
   '/noor/insights': typeof NoorInsightsRoute
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/experience'
     | '/feedback'
     | '/noor'
+    | '/visit'
     | '/noor/bookings'
     | '/noor/inbox'
     | '/noor/insights'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/experience'
     | '/feedback'
+    | '/visit'
     | '/noor/bookings'
     | '/noor/inbox'
     | '/noor/insights'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/experience'
     | '/feedback'
     | '/noor'
+    | '/visit'
     | '/noor/bookings'
     | '/noor/inbox'
     | '/noor/insights'
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   ExperienceRoute: typeof ExperienceRoute
   FeedbackRoute: typeof FeedbackRoute
   NoorRoute: typeof NoorRouteWithChildren
+  VisitRoute: typeof VisitRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -196,6 +209,13 @@ declare module '@tanstack/react-router' {
       path: '/noor'
       fullPath: '/noor'
       preLoaderRoute: typeof NoorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/visit': {
+      id: '/visit'
+      path: '/visit'
+      fullPath: '/visit'
+      preLoaderRoute: typeof VisitRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/noor/': {
@@ -252,6 +272,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExperienceRoute: ExperienceRoute,
   FeedbackRoute: FeedbackRoute,
   NoorRoute: NoorRouteWithChildren,
+  VisitRoute: VisitRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
