@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { digestDue, pendingSync, type FeedbackSync, type SmsDraftStatus, type SmsFrequency } from "./feedback-sync";
 
 export type MsgStatus = "processing" | "transcribing" | "translating" | "sent" | "delivered" | "waiting" | "review" | "error";
 export type Message = {
@@ -37,6 +38,26 @@ export type Feedback = {
   photo?: string | undefined;
   /** Optional display label, e.g. "Sample visitor · Germany" — never private details. */
   from?: string | undefined;
+  /** Visitor agreed to AI reading this feedback. */
+  consent?: boolean | undefined;
+  /** Missing on sample/older data (treated as synced). */
+  sync?: FeedbackSync | undefined;
+  sentiment?: string | undefined;
+  analyzedAt?: number | undefined;
+  /** Included in an SMS draft to Noor already. */
+  digested?: boolean | undefined;
+  at: number;
+};
+export type SmsDraft = {
+  id: string;
+  /** Swahili (Noor's language) text for her phone. */
+  text: string;
+  findings: string[];
+  suggestions: string[];
+  count: number;
+  status: SmsDraftStatus;
+  simulated: boolean;
+  needsReview: boolean;
   at: number;
 };
 export type Sms = { id: string; text: string; at: number };
@@ -53,6 +74,12 @@ export type State = {
   noorLanguage: string;
   capacity: Capacity;
   hostUnlocked: boolean;
+  smsDrafts: SmsDraft[];
+  noorPhone: string;
+  smsFrequency: SmsFrequency;
+  smsSimulated: boolean;
+  lastDigestAt?: number | undefined;
+  languageChosen: boolean;
 };
 /** Noor's own availability rules. Editable by Noor; bookings outside them are flagged, never auto-handled. */
 export type Capacity = { times: string[]; maxGuests: Record<string, number>; unavailable: string[]; availableDays: number[] };
@@ -98,6 +125,11 @@ const seed = (): State => ({
   noorLanguage: "Swahili",
   capacity: { times: ["08:00", "10:00", "14:00"], maxGuests: { walk: 8, process: 6, lunch: 10 }, unavailable: [], availableDays: [1, 2, 3, 4, 5, 6] },
   hostUnlocked: false,
+  smsDrafts: [],
+  noorPhone: "",
+  smsFrequency: "daily",
+  smsSimulated: true,
+  languageChosen: false,
   visitorLanguage: "English",
   feedback: [
     { id: "f1", rating: 5, text: "Meeting Noor was the highlight. She explained coffee processing so patiently.", tags: ["Meeting Noor", "Coffee"], at: Date.UTC(2026, 8, 2) },
@@ -165,7 +197,10 @@ export function hydrateStore() {
   }
   listeners.forEach((l) => l());
   window.addEventListener("online", flushQueue);
+  window.addEventListener("online", () => void syncFeedback());
   flushQueue();
+  void syncFeedback();
+  setInterval(() => void syncFeedback(), 60000);
 }
 
 export function resetDemo() {
@@ -382,8 +417,79 @@ export function acceptAlternative(id: string) {
   }));
 }
 
-export function submitFeedback(f: Omit<Feedback, "id" | "at">) {
-  set((s) => ({ ...s, feedback: [{ ...f, id: uid(), at: Date.now() }, ...s.feedback] }));
+export function submitFeedback(f: Omit<Feedback, "id" | "at" | "sync">) {
+  const item: Feedback = { ...f, id: uid(), at: Date.now(), sync: f.consent ? (online() ? "waiting" : "saved") : undefined };
+  set((s) => ({ ...s, feedback: [item, ...s.feedback] }));
+  void syncFeedback();
+  return item.id;
+}
+function patchFb(id: string, p: Partial<Feedback>) {
+  set((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, ...p } : f)) }));
+}
+const fbInFlight = new Set<string>();
+/** Analyses each consented, unsynced item once. Failed items stay and are retried; nothing is deleted. */
+export async function syncFeedback() {
+  if (!online()) return;
+  const list = pendingSync(state.feedback, fbInFlight);
+  const { buildDigest } = list.length ? await import("./digest.functions") : { buildDigest: null };
+  for (const f of list) {
+    if (fbInFlight.has(f.id)) continue;
+    fbInFlight.add(f.id);
+    patchFb(f.id, { sync: "waiting" });
+    try {
+      const r = await buildDigest!({ data: { feedback: [{ rating: f.rating, text: f.text || "(voice note)" }], language: state.noorLanguage } });
+      if (r.ok) patchFb(f.id, { sync: "synced", sentiment: r.digest.sentiment, analyzedAt: Date.now() });
+      else patchFb(f.id, { sync: "failed" });
+    } catch {
+      patchFb(f.id, { sync: online() ? "failed" : "saved" });
+    } finally {
+      fbInFlight.delete(f.id);
+    }
+  }
+  await prepareDigest();
+}
+export function retryFeedback(id: string) {
+  patchFb(id, { sync: "waiting" });
+  void syncFeedback();
+}
+let digesting = false;
+/** Prepares one Swahili SMS draft for Noor when her chosen frequency says it is time. */
+export async function prepareDigest(force = false) {
+  if (digesting || !online()) return;
+  const fresh = state.feedback.filter((f) => f.sync === "synced" && !f.digested);
+  if (!force && !digestDue(state.smsFrequency, state.lastDigestAt, Date.now(), fresh.length)) return;
+  if (!fresh.length) return;
+  digesting = true;
+  try {
+    const { buildDigest } = await import("./digest.functions");
+    const r = await buildDigest({ data: { feedback: fresh.map((f) => ({ rating: f.rating, text: f.text || "(voice note)" })), language: state.noorLanguage } });
+    if (!r.ok) return;
+    const { needsReview } = await import("./feedback-sync");
+    const ids = new Set(fresh.map((f) => f.id));
+    const draft: SmsDraft = { id: uid(), text: r.digest.sms, findings: r.digest.findings, suggestions: r.digest.suggestions, count: fresh.length, status: "ready", simulated: state.smsSimulated, needsReview: needsReview(r.digest.confidence), at: Date.now() };
+    set((s) => ({ ...s, lastDigestAt: Date.now(), smsDrafts: [draft, ...s.smsDrafts], feedback: s.feedback.map((f) => (ids.has(f.id) ? { ...f, digested: true } : f)) }));
+  } finally {
+    digesting = false;
+  }
+}
+export function setSmsSettings(p: Partial<Pick<State, "noorPhone" | "smsFrequency" | "smsSimulated">>) {
+  set((s) => ({ ...s, ...p }));
+}
+export function setDraft(id: string, p: Partial<SmsDraft>) {
+  set((s) => ({ ...s, smsDrafts: s.smsDrafts.map((d) => (d.id === id ? { ...d, ...p } : d)) }));
+}
+/** Demo: sample feedback with consent, to show the full flow. */
+export function addDemoFeedback() {
+  const at = Date.now();
+  const items: Feedback[] = [
+    { id: uid(), rating: 5, text: "The roasting over fire was wonderful. Noor was so kind.", tags: ["Coffee"], consent: true, sync: "waiting", from: "Sample visitor (demo)", at },
+    { id: uid(), rating: 3, text: "Lovely farm, but hard to find the road. A map would help.", tags: ["Farm walk"], consent: true, sync: "waiting", from: "Sample visitor (demo)", at },
+  ];
+  set((s) => ({ ...s, feedback: [...items, ...s.feedback] }));
+  void syncFeedback();
+}
+export function chooseLanguage(l: string) {
+  set((s) => ({ ...s, visitorLanguage: l, languageChosen: true }));
 }
 
 const THEMES = [
