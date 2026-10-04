@@ -40,7 +40,7 @@ function Chat() {
             <div key={m.id} className="ml-10 space-y-1">
               <div className="rounded-2xl rounded-br-sm bg-primary p-3 text-primary-foreground">
                 {m.audio ? <AudioPlayer src={m.audio} label="Your voice message" /> : m.text}
-                {m.transcript && <p className="mt-2 text-sm italic opacity-90">"{m.transcript}"</p>}
+                {m.audio && m.transcript && <p className="mt-2 text-sm italic opacity-90">"{m.transcript}"</p>}
               </div>
               {m.translated && <p className="rounded-xl bg-card p-2 text-xs text-muted-foreground">Translated for Noor ({NOOR_LANGUAGE}): {m.translated}</p>}
               <div className="flex items-center justify-end gap-3">
