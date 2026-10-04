@@ -18,3 +18,5 @@
 
 - Hosts live in src/lib/hosts.ts as data (Noor is the only active host); screens read host info from there so more hosts can be added without new screens.
 - Host area under /noor is gated by a demo PIN in store state; this is not security and must be replaced by real sign-in before launch.
+
+- SMS to Noor uses the phone's own messages app via sms: links (no paid SMS provider); sync/digest rules live in src/lib/feedback-sync.ts as pure functions so they stay testable.
