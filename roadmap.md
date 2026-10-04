@@ -29,4 +29,4 @@
 - [ ] Offline after a full page reload (needs installable offline setup on the published app — next step)
 - [ ] Real SMS / tipping / coffee payments (not connected — prototype labels shown)
 
-- [ ] Offline feedback + Swahili findings for Noor + two-way translation — NO Twilio or paid services (SMS simulated / sent from own phone)
+- [x] Offline feedback + Swahili findings for Noor + two-way translation — NO Twilio or paid services (SMS simulated / sent from own phone)

@@ -8,6 +8,7 @@ import harvestImg from "@/assets/impact-harvest.jpg";
 import cookingImg from "@/assets/impact-cooking.jpg";
 import communityImg from "@/assets/impact-community.jpg";
 import { AudioPlayer, Shell } from "@/components/rooted";
+import { LanguageWelcome } from "@/components/language-welcome";
 import { speakTranslation } from "@/lib/voice.functions";
 
 export const Route = createFileRoute("/")({
@@ -65,6 +66,7 @@ const IMPACT = [
 function Home() {
   return (
     <Shell>
+      <LanguageWelcome />
       <section className="relative h-[62vh] min-h-[440px] overflow-hidden">
         <img src={hero} alt="Noor's hands holding ripe coffee cherries at sunrise" width={1024} height={1280} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-earth-fade" />
