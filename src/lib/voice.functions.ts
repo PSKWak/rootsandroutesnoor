@@ -72,3 +72,24 @@ export const speakTranslation = createServerFn({ method: "POST" })
     }
     return { ok: true as const, audio: `data:audio/mpeg;base64,${Buffer.from(await r.arrayBuffer()).toString("base64")}` };
   });
+
+/** Translates short text (e.g. an insight) into Noor's chosen language. */
+export const translateText = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({ text: z.string().min(1).max(2000), targetLanguage: z.string().min(2).max(40) }).parse(d))
+  .handler(async ({ data }) => {
+    const aiKey = process.env["LOVABLE_API_KEY"];
+    if (!aiKey) return { ok: false as const, text: "" };
+    const r = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${aiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "openai/gpt-6-astra",
+        instructions: `Translate into ${data.targetLanguage}. Very simple words. Output only the translation.`,
+        input: data.text,
+      }),
+    });
+    if (!r.ok) return { ok: false as const, text: "" };
+    const j = (await r.json()) as { output_text?: string; output?: { content?: { text?: string }[] }[] };
+    const t = j.output_text ?? j.output?.flatMap((o) => o.content ?? []).map((c) => c.text ?? "").join("") ?? "";
+    return { ok: true as const, text: t.trim() };
+  });
