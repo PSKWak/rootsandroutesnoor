@@ -35,6 +35,8 @@ export type Feedback = {
   audio?: string | undefined;
   tags: string[];
   photo?: string | undefined;
+  /** Optional display label, e.g. "Sample visitor · Germany" — never private details. */
+  from?: string | undefined;
   at: number;
 };
 export type Sms = { id: string; text: string; at: number };
@@ -103,8 +105,36 @@ const seed = (): State => ({
     { id: "f3", rating: 4, text: "Great to see coffee processing up close. Is there a roasting session?", tags: ["Coffee", "Farming"], at: Date.UTC(2026, 8, 15) },
     { id: "f4", rating: 5, text: "Noor and her daughter made us feel like family.", tags: ["Meeting Noor", "Community"], at: Date.UTC(2026, 8, 21) },
     { id: "f5", rating: 4, text: "The washing and drying of coffee processing was fascinating.", tags: ["Meeting Noor", "Local culture"], at: Date.UTC(2026, 8, 27) },
+    ...SAMPLE_FEEDBACK,
   ],
 });
+
+/** 20 extra sample visitors (demo data — invented, not real people). */
+const sv = (n: number, rating: number, from: string, text: string, tags: string[], month: number, day: number): Feedback => ({
+  id: `s${n}`, rating, from, text, tags, at: Date.UTC(2026, month, day),
+});
+export const SAMPLE_FEEDBACK: Feedback[] = [
+  sv(1, 5, "Sample visitor · Germany", "The sunrise walk through the coffee trees was magical. Noor knows every plant.", ["Farm walk", "Meeting Noor"], 5, 3),
+  sv(2, 4, "Sample visitor · Japan", "I loved picking cherries. Signs along the path would help.", ["Farming", "Coffee"], 5, 8),
+  sv(3, 5, "Sample visitor · Kenya", "Lunch with the family was the best meal of my trip.", ["Community", "Local culture"], 5, 14),
+  sv(4, 3, "Sample visitor · USA", "Beautiful farm, but the path was muddy and steep after rain.", ["Farm walk"], 5, 20),
+  sv(5, 5, "Sample visitor · France", "Translation made it easy to ask Noor questions. Very personal.", ["Meeting Noor"], 5, 27),
+  sv(6, 4, "Sample visitor · Brazil", "As a coffee lover, seeing the drying beds was fascinating. Would love roasting.", ["Coffee", "Farming"], 6, 2),
+  sv(7, 5, "Sample visitor · India", "Noor's daughter taught us a song. We felt welcomed like family.", ["Community", "Meeting Noor"], 6, 9),
+  sv(8, 4, "Sample visitor · UK", "Wonderful visit. I wish I could buy beans to take home.", ["Coffee"], 6, 15),
+  sv(9, 5, "Sample visitor · Spain", "Hearing Noor's voice messages before arriving made me trust the visit.", ["Meeting Noor"], 6, 22),
+  sv(10, 4, "Sample visitor · Canada", "Great experience. Pickup from town was a little hard to arrange.", ["Farm walk"], 6, 29),
+  sv(11, 5, "Sample visitor · Italy", "The clay-pan roasting smelled incredible. Best coffee I've had.", ["Coffee", "Local culture"], 7, 4),
+  sv(12, 3, "Sample visitor · Australia", "Lovely people. The visit felt short — I'd like a longer option.", ["Meeting Noor"], 7, 10),
+  sv(13, 5, "Sample visitor · Netherlands", "Learning how the beans are washed in spring water was eye-opening.", ["Farming", "Coffee"], 7, 16),
+  sv(14, 4, "Sample visitor · South Korea", "Kids loved it. More shade and water stops would help families.", ["Farm walk", "Community"], 7, 21),
+  sv(15, 5, "Sample visitor · Mexico", "Noor explained everything so patiently. I'll tell my friends.", ["Meeting Noor"], 7, 26),
+  sv(16, 4, "Sample visitor · Sweden", "Peaceful and real. I wish there was a roasting class.", ["Coffee", "Local culture"], 8, 1),
+  sv(17, 5, "Sample visitor · Ethiopia", "It reminded me of my grandmother's coffee ceremony. Very moving.", ["Local culture", "Community"], 8, 5),
+  sv(18, 4, "Sample visitor · Argentina", "Good walk, friendly hosts. Directions to the farm could be clearer.", ["Farm walk"], 8, 12),
+  sv(19, 5, "Sample visitor · Ghana", "Sharing lunch and stories with Noor was the heart of the trip.", ["Meeting Noor", "Community"], 8, 18),
+  sv(20, 4, "Sample visitor · Ireland", "Loved it. A short guide to what shoes to bring would help.", ["Farm walk", "Farming"], 8, 24),
+];
 
 const KEY = "rooted-state-v1";
 let state: State = seed();
@@ -122,7 +152,14 @@ function emit() {
 export function hydrateStore() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) state = { ...seed(), ...JSON.parse(raw) };
+    if (raw) {
+      const saved = JSON.parse(raw) as Partial<State>;
+      state = { ...seed(), ...saved };
+      // Add any new sample visitors that older saved data doesn't have yet.
+      const have = new Set(state.feedback.map((f) => f.id));
+      const missing = SAMPLE_FEEDBACK.filter((f) => !have.has(f.id));
+      if (missing.length) state = { ...state, feedback: [...state.feedback, ...missing] };
+    }
   } catch {
     /* ignore */
   }
