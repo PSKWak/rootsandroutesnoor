@@ -64,6 +64,10 @@ function Dashboard() {
             <span><span className="block text-sm font-semibold">Most mentioned</span><span className="text-xl font-semibold">{top.count} visitors {top.label}</span></span>
           </Link>
         )}
+        <Link to="/noor/sms" className="mt-3 flex items-center gap-4 rounded-3xl border-2 bg-card p-5">
+          <span className="text-4xl" aria-hidden="true">✉️</span>
+          <span className="text-xl font-semibold">Text messages for Noor</span>
+        </Link>
         {demoFb && <p className="mt-2 text-xs text-muted-foreground">Includes sample feedback (demo).</p>}
 
         <div className="mt-8 flex flex-wrap justify-between gap-3 text-sm">

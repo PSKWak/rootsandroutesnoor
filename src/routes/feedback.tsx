@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { AudioPlayer, Recorder, Shell } from "@/components/rooted";
-import { FEEDBACK_TAGS, submitFeedback } from "@/lib/store";
+import { FEEDBACK_TAGS, retryFeedback, submitFeedback, useStore } from "@/lib/store";
+import { SYNC_LABEL } from "@/lib/feedback-sync";
 
 export const Route = createFileRoute("/feedback")({
   head: () => ({
@@ -26,7 +27,9 @@ function FeedbackPage() {
   const [audio, setAudio] = useState<string>();
   const [photo, setPhoto] = useState<string>();
   const [tags, setTags] = useState<string[]>([]);
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState<string | false>(false);
+  const [consent, setConsent] = useState(true);
+  const sent = useStore((s) => (done ? s.feedback.find((f) => f.id === done) : undefined));
 
   return (
     <Shell title="Feedback" back="/">
@@ -34,6 +37,12 @@ function FeedbackPage() {
         <div className="px-5 py-12 text-center">
           <h2 className="text-3xl font-semibold">Thank you</h2>
           <p className="mt-2 text-lg">Your feedback has been shared with Noor.</p>
+          {sent?.sync && (
+            <p role="status" aria-live="polite" className="mx-auto mt-4 inline-flex items-center gap-2 rounded-full border bg-card px-4 py-2 font-semibold">
+              {sent.sync === "synced" ? "✅" : sent.sync === "failed" ? "⚠️" : sent.sync === "waiting" ? "🔄" : "📱"} {SYNC_LABEL[sent.sync]}
+            </p>
+          )}
+          {sent?.sync === "failed" && <button onClick={() => retryFeedback(sent.id)} className="mt-3 block w-full rounded-full border py-3 font-semibold">↻ Try again</button>}
           <p className="mt-1 text-sm text-muted-foreground">Your feedback helps Noor improve future experiences. If you're offline, it's saved on this phone.</p>
           <button onClick={() => { setDone(false); setRating(0); setText(""); setAudio(undefined); setPhoto(undefined); setTags([]); }} className="mt-6 font-semibold text-primary">Leave another</button>
         </div>
@@ -43,8 +52,7 @@ function FeedbackPage() {
           onSubmit={(e) => {
             e.preventDefault();
             if (!rating) return;
-            submitFeedback({ rating, tags, ...(text ? { text } : {}), ...(audio ? { audio } : {}), ...(photo ? { photo } : {}) });
-            setDone(true);
+            setDone(submitFeedback({ rating, tags, consent, ...(text ? { text } : {}), ...(audio ? { audio } : {}), ...(photo ? { photo } : {}) }));
           }}
         >
           <h2 className="text-3xl font-semibold">How was your experience?</h2>
@@ -94,6 +102,10 @@ function FeedbackPage() {
               );
             })}
           </div>
+          <label className="flex items-start gap-3 rounded-2xl border bg-card p-4 text-sm">
+            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-5 w-5" />
+            <span>Let Noor's helper (AI) read this to help her. It's kept on this phone until there's signal. Your name is never sent to Noor by text.</span>
+          </label>
           <button disabled={!rating} className="w-full rounded-full bg-primary py-4 text-lg font-semibold text-primary-foreground shadow-warm disabled:opacity-40">Send feedback</button>
         </form>
       )}
