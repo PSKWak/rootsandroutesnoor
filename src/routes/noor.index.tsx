@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Mail, CalendarCheck, MessageCircle, Heart, Lightbulb, Smartphone } from "lucide-react";
+import { Mail, CalendarCheck, Lightbulb, Smartphone } from "lucide-react";
 import noor from "@/assets/noor.jpg";
 import { Shell } from "@/components/rooted";
 import { resetDemo, useStore } from "@/lib/store";
