@@ -44,15 +44,15 @@ function Experience() {
                   <li key={s.t}>
                     <div className="flex items-start gap-3">
                       <span className="relative flex h-8 w-8 shrink-0 items-center justify-center">
-                        {last && <span className="flow-halo seq absolute inset-0 rounded-full bg-primary animate-halo" aria-hidden="true" />}
-                        {last && (
-                          <span className="flow-steam seq pointer-events-none absolute inset-x-0 -top-4 flex items-end justify-center gap-1" aria-hidden="true">
-                            <span className="h-2 w-0.5 rounded-full bg-primary/50 animate-steam" />
-                            <span className="h-3 w-0.5 rounded-full bg-primary/40 animate-steam" style={{ animationDelay: "800ms" }} />
-                            <span className="h-2 w-0.5 rounded-full bg-primary/50 animate-steam" style={{ animationDelay: "1600ms" }} />
-                          </span>
-                        )}
                         <span className="seq relative block animate-pop-in text-2xl" style={{ animationDelay: `${i * 240}ms` }} aria-hidden="true">
+                          {last && <span className="flow-halo seq absolute -inset-1 rounded-full bg-primary animate-halo" />}
+                          {last && (
+                            <span className="flow-steam seq pointer-events-none absolute inset-x-0 -top-5 flex items-end justify-center gap-1">
+                              <span className="seq h-2 w-0.5 rounded-full bg-primary/50 animate-steam" />
+                              <span className="seq h-3 w-0.5 rounded-full bg-primary/40 animate-steam" style={{ animationDelay: "800ms" }} />
+                              <span className="seq h-2 w-0.5 rounded-full bg-primary/50 animate-steam" style={{ animationDelay: "1600ms" }} />
+                            </span>
+                          )}
                           <span className="seq block animate-bob" style={{ animationDelay: `${i * 420}ms` }}>{s.e}</span>
                         </span>
                       </span>
