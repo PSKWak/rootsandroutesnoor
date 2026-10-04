@@ -25,12 +25,12 @@ function range(months: string[]) {
 }
 
 function Visit() {
-  const [mi, setMi] = useState(3);
+  const [mi, setMi] = useState(() => new Date().getMonth());
   const m = CALENDAR[mi]!;
   const a = ACTIVITIES[m.activity];
 
   return (
-    <Shell title="Plan your visit" back="/experience">
+    <Shell title="Plan" back="/experience">
       <p className="mx-5 mt-4 rounded-xl bg-muted px-4 py-3 text-xs text-muted-foreground">
         Sample information — the seasons, location and terrain below will be updated once Noor confirms them.
       </p>
@@ -81,7 +81,6 @@ function Visit() {
 
       <GettingHere />
       <KnowBefore />
-      <Planner />
     </Shell>
   );
 }
@@ -160,44 +159,6 @@ function KnowBefore() {
           </div>
         ))}
       </dl>
-    </section>
-  );
-}
-
-function Planner() {
-  const [date, setDate] = useState("");
-  const [exp, setExp] = useState(EXPERIENCES[0]!.id);
-  const [guests, setGuests] = useState(2);
-  const idx = monthIndexFromDate(date);
-  const month = idx === null ? null : CALENDAR[idx]!;
-  const e = EXPERIENCES.find((x) => x.id === exp)!;
-  return (
-    <section className="px-5 py-8">
-      <h2 className="text-2xl font-semibold">Plan your visit</h2>
-      <div className="mt-3 space-y-3">
-        <label className="block text-sm font-semibold">When
-          <input type="date" value={date} onChange={(ev) => setDate(ev.target.value)} className="mt-1 h-12 w-full rounded-xl border bg-card px-3" />
-        </label>
-        <label className="block text-sm font-semibold">Experience
-          <select value={exp} onChange={(ev) => setExp(ev.target.value)} className="mt-1 h-12 w-full rounded-xl border bg-card px-3">
-            {EXPERIENCES.map((x) => <option key={x.id} value={x.id}>{x.title}</option>)}
-          </select>
-        </label>
-        <label className="block text-sm font-semibold">Group size
-          <input type="number" min={1} max={8} value={guests} onChange={(ev) => setGuests(+ev.target.value)} className="mt-1 h-12 w-full rounded-xl border bg-card px-3" />
-        </label>
-      </div>
-      {month && (
-        <article className="mt-5 space-y-2 rounded-2xl border bg-card p-5 text-sm">
-          <h3 className="text-lg font-semibold">Your visit</h3>
-          <p>📅 Date: {date} · {guests} visitor(s)</p>
-          <p>🌱 Farm activity: {ACTIVITIES[month.activity].icon} {ACTIVITIES[month.activity].label}</p>
-          <p>☕ Experience: {e.title} {month.experiences.includes(exp) ? "" : "— not usually offered this month, ask Noor"}</p>
-          <p>📍 Getting there: {TRANSPORT.options.map((t) => t.label).join(", ")} · pickup {TRANSPORT.pickup.toLowerCase()}</p>
-          <p>🥾 Terrain: {month.rainy ? "Paths may be muddy — " : ""}comfortable walking shoes recommended</p>
-          <Link to="/book" search={{ exp }} className="mt-3 block rounded-full bg-primary py-3 text-center font-semibold text-primary-foreground">Send request to Noor</Link>
-        </article>
-      )}
     </section>
   );
 }
