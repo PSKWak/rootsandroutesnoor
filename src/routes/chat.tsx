@@ -138,18 +138,6 @@ function Chat() {
         {visible.length > 0 && !more && (
           <button onClick={() => setMore(true)} className="w-full rounded-full border bg-card py-3 font-semibold">Ask another question</button>
         )}
-        {sms[0] && (
-          <div className="flex gap-3 rounded-2xl border-2 border-dashed border-secondary p-3 text-sm">
-            <Smartphone className="h-5 w-5 shrink-0 text-secondary" />
-            <div>
-              <p className="font-semibold">SMS fallback — prototype (no real SMS sent)</p>
-              <p className="text-muted-foreground">"{sms[0].text}"</p>
-            </div>
-          </div>
-        )}
-        {visible.length > 0 && (
-          <Link to="/experience" className="block rounded-full border py-3 text-center font-semibold">Explore the coffee journey →</Link>
-        )}
       </div>
 
       <div className="fixed inset-x-0 bottom-16 mx-auto max-w-md border-t bg-background p-3">

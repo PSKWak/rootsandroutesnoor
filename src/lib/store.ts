@@ -301,9 +301,6 @@ export function sendVisitorMessage(input: { text?: string; audio?: string }) {
 function deliver(id: string) {
   setTimeout(() => {
     patch(id, { status: "delivered" });
-    const m = state.messages.find((x) => x.id === id);
-    if (m?.from === "visitor")
-      smsToNoor(`Roots & Routes: New ${m.audio ? "voice " : ""}message from a visitor. Open the app on the shared phone to listen.`);
   }, 1200);
 }
 
