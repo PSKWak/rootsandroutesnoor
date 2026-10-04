@@ -18,7 +18,6 @@ export const Route = createFileRoute("/experience")({
   component: Experience,
 });
 
-
 const STORY = [
   { e: "🌱", t: "Growing", d: "Local farmers care for the coffee plants." },
   { e: "🧺", t: "Harvesting", d: "People carefully pick the coffee cherries." },
@@ -30,7 +29,6 @@ const STORY = [
 function Experience() {
   return (
     <Shell title="The Coffee Journey" back="/">
-
       <section className="mx-5 overflow-hidden rounded-3xl bg-card shadow-warm">
         <img src={roasting} alt="Hands roasting coffee beans in a clay pan over fire" width={1024} height={768} loading="lazy" className="h-48 w-full object-cover" />
         <div className="p-6">
