@@ -30,3 +30,15 @@
 - [ ] Real SMS / tipping / coffee payments (not connected — prototype labels shown)
 
 - [x] Offline feedback + Swahili findings for Noor + two-way translation — NO Twilio or paid services (SMS simulated / sent from own phone)
+
+## QA fix plan (uploaded Oct 4) — user chose "Everything"
+- [x] B4/D3 dead planner form removed; /visit titled "Plan"; opens on current month
+- [x] B5 booking: no past dates, closed/off days blocked, contact checked, group capped at Noor's limit
+- [x] B7 feedback prompts no longer glued into text; B8 honest saved/sent wording; consent off by default
+- [x] B14 plurals on booking screen
+- [ ] B1 voice: hide mic until STT key works (blocked: ElevenLabs key with Speech-to-Text)
+- [ ] B2 real translation for reply labels; B3 silent buttons; B6 +255 check; B9 spinner timeout; B10 tried actions leave list
+- [ ] B11 shared host guard + auto-logout; B12 SMS reply confirm; B13 pickups in counters
+- [ ] D1 ExperienceCard; D2 ShareBar; D4 pickup prefill; D5 Ask Noor entry points; D6 DEMO_MODE flag; D7 inbox labels
+- [ ] Full-interface translation + Arabic RTL; PIN masking/lockout; accessibility items
+- [ ] Real farm details from Noor (blocked: waiting on Noor)

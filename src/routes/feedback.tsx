@@ -24,11 +24,12 @@ const PROMPTS = ["What did you enjoy most?", "What surprised you?", "What could 
 function FeedbackPage() {
   const [rating, setRating] = useState(0);
   const [text, setText] = useState("");
+  const [prompt, setPrompt] = useState<string>();
   const [audio, setAudio] = useState<string>();
   const [photo, setPhoto] = useState<string>();
   const [tags, setTags] = useState<string[]>([]);
   const [done, setDone] = useState<string | false>(false);
-  const [consent, setConsent] = useState(true);
+  const [consent, setConsent] = useState(false);
   const sent = useStore((s) => (done ? s.feedback.find((f) => f.id === done) : undefined));
 
   return (
@@ -36,7 +37,7 @@ function FeedbackPage() {
       {done ? (
         <div className="px-5 py-12 text-center">
           <h2 className="text-3xl font-semibold">Thank you</h2>
-          <p className="mt-2 text-lg">Your feedback has been shared with Noor.</p>
+          <p className="mt-2 text-lg">{sent?.sync === "synced" ? "Sent to Noor." : sent?.sync === "saved" || sent?.sync === "waiting" ? "Saved on this phone. It will send when you have signal." : "Saved — sending…"}</p>
           {sent?.sync && (
             <p role="status" aria-live="polite" className="mx-auto mt-4 inline-flex items-center gap-2 rounded-full border bg-card px-4 py-2 font-semibold">
               {sent.sync === "synced" ? "✅" : sent.sync === "failed" ? "⚠️" : sent.sync === "waiting" ? "🔄" : "📱"} {SYNC_LABEL[sent.sync]}
@@ -65,11 +66,11 @@ function FeedbackPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             {PROMPTS.map((p) => (
-              <button key={p} type="button" onClick={() => setText((t) => (t ? t + "\n" : "") + p + " ")} className="rounded-full bg-muted px-3 py-2 text-sm">{p}</button>
+              <button key={p} type="button" onClick={() => setPrompt(p)} aria-pressed={prompt === p} className={`rounded-full px-3 py-2 text-sm ${prompt === p ? "bg-primary text-primary-foreground" : "bg-muted"}`}>{p}</button>
             ))}
           </div>
           <p className="text-xs text-muted-foreground">Write or speak in any language — it will be translated for Noor.</p>
-          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={4} placeholder="What stayed with you?" className="w-full rounded-2xl border bg-card p-4" />
+          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={4} placeholder={prompt ?? "What stayed with you?"} aria-label={prompt ?? "Your feedback"} className="w-full rounded-2xl border bg-card p-4" />
           <div className="space-y-2">
             {audio ? <AudioPlayer src={audio} label="Your voice feedback" /> : <Recorder big label="Or record voice feedback" onDone={(a) => setAudio(a)} />}
           </div>
