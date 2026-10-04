@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Send, Smartphone, Volume2, Loader2, ArrowDown } from "lucide-react";
+import { Send, Volume2, Loader2, ArrowDown } from "lucide-react";
 import noor from "@/assets/noor.jpg";
 import { AudioPlayer, MsgBadge, Recorder, Shell, useOnline } from "@/components/rooted";
 import { LANGUAGES, REPLY_TIME, SUGGESTED, retryMessage, sendVisitorMessage, setVisitorLanguage, useStore } from "@/lib/store";
