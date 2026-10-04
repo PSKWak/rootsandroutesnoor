@@ -292,7 +292,7 @@ export function ListenButton({ text, language, big }: { text: string; language?:
       }}
       className={`inline-flex items-center justify-center gap-2 rounded-full bg-secondary font-semibold text-secondary-foreground ${big ? "min-h-14 w-full px-5 text-lg" : "min-h-11 px-4 text-sm"}`}
     >
-      {state === "loading" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Play className="h-5 w-5" />}
+      {state === "loading" && <Loader2 className="h-5 w-5 animate-spin" />}
       {state === "error" ? "Can't play now" : "🔊 Listen"}
     </button>
   );
