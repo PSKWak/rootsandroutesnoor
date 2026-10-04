@@ -18,12 +18,6 @@ export const Route = createFileRoute("/experience")({
   component: Experience,
 });
 
-const JOURNEY = [
-  { t: "Cherry", d: "Picked by hand when deep red." },
-  { t: "Pulp & Wash", d: "Fruit removed, beans washed in spring water." },
-  { t: "Sun Dry", d: "Beans rest on raised beds for around two weeks." },
-  { t: "Roast & Share", d: "Roasted in a clay pan over fire, brewed for guests." },
-];
 
 const STORY = [
   { e: "🌱", t: "Growing", d: "Local farmers care for the coffee plants." },
@@ -36,19 +30,6 @@ const STORY = [
 function Experience() {
   return (
     <Shell title="The Coffee Journey" back="/">
-      <section className="px-5 py-6">
-        <ol className="space-y-4 border-l-2 border-accent pl-5">
-          {JOURNEY.map((j, i) => (
-            <li key={j.t} className="relative">
-              <span className="absolute -left-[29px] flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground animate-rise-in" style={{ animationDelay: `${i * 90}ms` }}>{i + 1}</span>
-              <Reveal delay={i * 90}>
-                <h3 className="font-semibold">{j.t}</h3>
-                <p className="text-sm text-muted-foreground">{j.d}</p>
-              </Reveal>
-            </li>
-          ))}
-        </ol>
-      </section>
 
       <section className="mx-5 overflow-hidden rounded-3xl bg-card shadow-warm">
         <img src={roasting} alt="Hands roasting coffee beans in a clay pan over fire" width={1024} height={768} loading="lazy" className="h-48 w-full object-cover" />
