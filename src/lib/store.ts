@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-export type MsgStatus = "sent" | "delivered" | "waiting" | "review";
+export type MsgStatus = "processing" | "transcribing" | "translating" | "sent" | "delivered" | "waiting" | "review" | "error";
 export type Message = {
   id: string;
   from: "visitor" | "noor";
@@ -10,6 +10,8 @@ export type Message = {
   status: MsgStatus;
   at: number;
   heardByNoor?: boolean | undefined;
+  transcript?: string | undefined;
+  error?: string | undefined;
 };
 export type BookingStatus = "requested" | "awaiting" | "confirmed" | "declined" | "alternative";
 export type Booking = {
@@ -110,19 +112,56 @@ function set(fn: (s: State) => State) {
 const uid = () => Math.random().toString(36).slice(2, 10);
 const online = () => typeof navigator === "undefined" || navigator.onLine;
 
-/** Simulated translation for the demo (English → Noor's language, Ondera). */
-export function translateForNoor(text: string) {
-  return `[Ondera] ${text}`;
-}
-
-const NOOR_REPLIES = [
-  "Welcome! Yes, you can visit. Mornings are best, the mist is beautiful. Bring good shoes.",
-  "Thank you for your message. The cherries are ripe now. I will show you everything.",
-  "Yes, children are welcome. My daughter will help translate when you arrive.",
-];
+/** Noor's language for translations. Placeholder until the real language is confirmed. */
+export const NOOR_LANGUAGE = "Swahili";
+export const VISITOR_LANGUAGE = "English";
 
 function smsToNoor(text: string) {
   set((s) => ({ ...s, sms: [{ id: uid(), text, at: Date.now() }, ...s.sms] }));
+}
+
+function patch(id: string, p: Partial<Message>) {
+  set((s) => ({ ...s, messages: s.messages.map((m) => (m.id === id ? { ...m, ...p } : m)) }));
+}
+
+const inFlight = new Set<string>();
+
+/** Transcribe (if voice) + translate on the server, then deliver. Recording is kept locally throughout. */
+async function processMessage(id: string) {
+  const m = state.messages.find((x) => x.id === id);
+  if (!m || inFlight.has(id)) return;
+  if (!online()) return patch(id, { status: "waiting" });
+  inFlight.add(id);
+  try {
+    patch(id, { status: m.audio ? "transcribing" : "translating", error: undefined });
+    const { processVoice } = await import("./voice.functions");
+    if (m.audio) setTimeout(() => state.messages.find((x) => x.id === id)?.status === "transcribing" && patch(id, { status: "translating" }), 2500);
+    const r = await processVoice({
+      data: {
+        ...(m.audio ? { audio: m.audio } : { text: m.text ?? "" }),
+        from: m.from,
+        targetLanguage: m.from === "visitor" ? NOOR_LANGUAGE : VISITOR_LANGUAGE,
+      },
+    });
+    if (!r.ok) return patch(id, { status: "error", error: r.error });
+    patch(id, {
+      transcript: r.transcript || undefined,
+      translated: r.translated || undefined,
+      // Noor's translated reply always waits for her family's review before the visitor sees it
+      status: m.from === "noor" ? "review" : "sent",
+      error: "error" in r ? r.error : undefined,
+    });
+    if (m.from === "visitor") deliver(id);
+  } catch (e) {
+    patch(id, { status: online() ? "error" : "waiting", error: online() ? "Could not process. Tap retry." : undefined });
+    console.error(e);
+  } finally {
+    inFlight.delete(id);
+  }
+}
+
+export function retryMessage(id: string) {
+  void processMessage(id);
 }
 
 export function sendVisitorMessage(input: { text?: string; audio?: string }) {
@@ -130,21 +169,17 @@ export function sendVisitorMessage(input: { text?: string; audio?: string }) {
     id: uid(),
     from: "visitor",
     text: input.text,
-    translated: input.text ? translateForNoor(input.text) : undefined,
     audio: input.audio,
-    status: online() ? "sent" : "waiting",
+    status: online() ? "processing" : "waiting",
     at: Date.now(),
   };
   set((s) => ({ ...s, messages: [...s.messages, m] }));
-  if (m.status === "sent") deliver(m.id);
+  void processMessage(m.id);
 }
 
 function deliver(id: string) {
   setTimeout(() => {
-    set((s) => ({
-      ...s,
-      messages: s.messages.map((m) => (m.id === id ? { ...m, status: "delivered" } : m)),
-    }));
+    patch(id, { status: "delivered" });
     const m = state.messages.find((x) => x.id === id);
     if (m?.from === "visitor")
       smsToNoor(`Rooted: New ${m.audio ? "voice " : ""}message from a visitor. Open Rooted on the shared phone to listen.`);
@@ -153,31 +188,19 @@ function deliver(id: string) {
 
 export function flushQueue() {
   if (!online()) return;
-  const waiting = state.messages.filter((m) => m.status === "waiting");
-  if (!waiting.length) return;
-  set((s) => ({
-    ...s,
-    messages: s.messages.map((m) => (m.status === "waiting" ? { ...m, status: "sent" } : m)),
-  }));
-  waiting.forEach((m) => deliver(m.id));
+  state.messages
+    .filter((m) => m.status === "waiting" || m.status === "processing" || m.status === "transcribing" || m.status === "translating")
+    .forEach((m) => void processMessage(m.id));
 }
 
 export function markHeard(id: string) {
-  set((s) => ({ ...s, messages: s.messages.map((m) => (m.id === id ? { ...m, heardByNoor: true } : m)) }));
+  patch(id, { heardByNoor: true });
 }
 
 export function sendNoorReply(audio: string) {
-  const n = state.messages.filter((m) => m.from === "noor").length;
-  const m: Message = {
-    id: uid(),
-    from: "noor",
-    audio,
-    translated: NOOR_REPLIES[n % NOOR_REPLIES.length],
-    // auto-translations of Noor's voice are flagged until she/her daughter confirms
-    status: online() ? "review" : "waiting",
-    at: Date.now(),
-  };
+  const m: Message = { id: uid(), from: "noor", audio, status: online() ? "processing" : "waiting", at: Date.now() };
   set((s) => ({ ...s, messages: [...s.messages, m] }));
+  void processMessage(m.id);
 }
 
 export function approveTranslation(id: string) {

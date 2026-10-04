@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Send, Smartphone } from "lucide-react";
 import noor from "@/assets/noor.jpg";
 import { AudioPlayer, MsgBadge, Recorder, Shell } from "@/components/rooted";
-import { sendVisitorMessage, useStore } from "@/lib/store";
+import { NOOR_LANGUAGE, retryMessage, sendVisitorMessage, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/chat")({
   head: () => ({
@@ -40,16 +40,21 @@ function Chat() {
             <div key={m.id} className="ml-10 space-y-1">
               <div className="rounded-2xl rounded-br-sm bg-primary p-3 text-primary-foreground">
                 {m.audio ? <AudioPlayer src={m.audio} label="Your voice message" /> : m.text}
+                {m.audio && m.transcript && <p className="mt-2 text-sm italic opacity-90">"{m.transcript}"</p>}
               </div>
-              {m.translated && <p className="rounded-xl bg-card p-2 text-xs text-muted-foreground">Translated for Noor: {m.translated}</p>}
-              <div className="text-right"><MsgBadge status={m.status} /></div>
+              {m.translated && <p className="rounded-xl bg-card p-2 text-xs text-muted-foreground">Translated for Noor ({NOOR_LANGUAGE}): {m.translated}</p>}
+              <div className="flex items-center justify-end gap-3">
+                {m.error && <span className="text-xs text-destructive">{m.error}</span>}
+                {m.status === "error" && <button onClick={() => retryMessage(m.id)} className="text-xs font-semibold text-primary">Retry</button>}
+                <MsgBadge status={m.status} />
+              </div>
             </div>
           ) : (
             <div key={m.id} className="mr-10 space-y-2 rounded-2xl rounded-bl-sm border bg-card p-3">
               <p className="text-xs font-semibold text-secondary">Noor — her own voice</p>
               {m.audio && <AudioPlayer src={m.audio} label="Listen to Noor" />}
-              <p className="text-sm">{m.translated}</p>
-              <p className="text-xs text-muted-foreground">Translated from Ondera · reviewed by Noor's family</p>
+              {m.translated && <p className="text-sm">{m.translated}</p>}
+              <p className="text-xs text-muted-foreground">Translated from {NOOR_LANGUAGE} · reviewed by Noor's family</p>
             </div>
           ),
         )}
@@ -67,7 +72,7 @@ function Chat() {
       </div>
 
       <form
-        className="fixed inset-x-0 bottom-16 mx-auto flex max-w-md items-center gap-2 border-t bg-background p-3"
+        className="fixed inset-x-0 bottom-16 mx-auto flex max-w-md flex-wrap items-center gap-2 border-t bg-background p-3"
         onSubmit={(e) => {
           e.preventDefault();
           if (!text.trim()) return;
@@ -79,7 +84,7 @@ function Chat() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Write to Noor…"
-          className="h-12 flex-1 rounded-full border bg-card px-4 outline-none focus:ring-2 focus:ring-ring"
+          className="h-12 min-w-0 flex-1 rounded-full border bg-card px-4 outline-none focus:ring-2 focus:ring-ring"
         />
         {text ? (
           <button className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground" aria-label="Send">

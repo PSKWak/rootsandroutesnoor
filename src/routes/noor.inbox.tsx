@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AudioPlayer, MsgBadge, Recorder, Shell } from "@/components/rooted";
-import { approveTranslation, markHeard, sendNoorReply, useStore } from "@/lib/store";
+import { approveTranslation, retryMessage, markHeard, sendNoorReply, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/noor/inbox")({ component: Inbox });
 
 /** Demo-only: speak the translated text so Noor can "listen" to typed messages. */
 function speak(text: string) {
-  const u = new SpeechSynthesisUtterance(text.replace("[Ondera] ", ""));
+  const u = new SpeechSynthesisUtterance(text);
   speechSynthesis.speak(u);
 }
 
@@ -27,16 +27,20 @@ function Inbox() {
                   ▶ Listen
                 </button>
               )}
-              {m.translated && <p className="text-base">{m.translated}</p>}
+              {m.translated && <p className="text-lg">{m.translated}</p>}
               <MsgBadge status={m.status} />
             </div>
           ) : (
             <div key={m.id} className="ml-6 space-y-3 rounded-3xl bg-muted p-5">
               <p className="text-sm font-semibold">Your reply</p>
               {m.audio && <AudioPlayer src={m.audio} label="Your voice" />}
-              <p className="text-sm">English: {m.translated}</p>
+              {m.transcript && <p className="text-sm text-muted-foreground">"{m.transcript}"</p>}
+              {m.translated && <p className="text-sm">English: {m.translated}</p>}
               <MsgBadge status={m.status} />
-              {m.status === "review" && (
+              {m.status === "error" && (
+                <button onClick={() => retryMessage(m.id)} className="w-full rounded-full border py-4 text-lg font-semibold">↻ Try again</button>
+              )}
+              {m.status === "review" && m.translated && (
                 <button onClick={() => approveTranslation(m.id)} className="w-full rounded-full bg-primary py-4 text-lg font-semibold text-primary-foreground">
                   ✓ Translation is right — send
                 </button>
@@ -45,7 +49,7 @@ function Inbox() {
           ),
         )}
         <div className="pt-4">
-          <Recorder big label="Record reply" onDone={sendNoorReply} />
+          <Recorder big label="Record Reply" onDone={sendNoorReply} />
           <p className="mt-2 text-center text-xs text-muted-foreground">Visitors hear your real voice, with a translation below.</p>
         </div>
       </div>
