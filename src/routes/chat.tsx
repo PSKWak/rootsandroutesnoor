@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Send, Smartphone, Volume2, Loader2, ArrowDown } from "lucide-react";
+import { Send, Volume2, Loader2, ArrowDown } from "lucide-react";
 import noor from "@/assets/noor.jpg";
 import { AudioPlayer, MsgBadge, Recorder, Shell, useOnline } from "@/components/rooted";
 import { LANGUAGES, REPLY_TIME, SUGGESTED, retryMessage, sendVisitorMessage, setVisitorLanguage, useStore } from "@/lib/store";
@@ -46,7 +46,6 @@ function HearTranslation({ text }: { text: string }) {
 
 function Chat() {
   const messages = useStore((s) => s.messages);
-  const sms = useStore((s) => s.sms);
   const lang = useStore((s) => s.visitorLanguage);
   const NOOR_LANGUAGE = useStore((s) => s.noorLanguage);
   const on = useOnline();
@@ -137,18 +136,6 @@ function Chat() {
 
         {visible.length > 0 && !more && (
           <button onClick={() => setMore(true)} className="w-full rounded-full border bg-card py-3 font-semibold">Ask another question</button>
-        )}
-        {sms[0] && (
-          <div className="flex gap-3 rounded-2xl border-2 border-dashed border-secondary p-3 text-sm">
-            <Smartphone className="h-5 w-5 shrink-0 text-secondary" />
-            <div>
-              <p className="font-semibold">SMS fallback — prototype (no real SMS sent)</p>
-              <p className="text-muted-foreground">"{sms[0].text}"</p>
-            </div>
-          </div>
-        )}
-        {visible.length > 0 && (
-          <Link to="/experience" className="block rounded-full border py-3 text-center font-semibold">Explore the coffee journey →</Link>
         )}
       </div>
 
