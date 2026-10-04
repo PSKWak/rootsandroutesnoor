@@ -66,11 +66,20 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Lightweight journey motion: opacity/transform only, GPU-friendly. */
+/* Lightweight journey motion: opacity/transform only, GPU-friendly.
+ * Anything tagged .seq stays frozen at its first keyframe until the Reveal
+ * wrapper that owns it scrolls into view, so a sequence plays in order. */
 @theme {
   --animate-rise-in: rise-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-bob: bob 3.4s ease-in-out infinite;
   --animate-arrow-drop: arrow-drop 2.4s ease-in-out infinite;
+  --animate-pop-in: pop-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-slide-in: slide-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-flow-segment: flow-segment 0.45s ease-out both;
+  --animate-chev: chev 0.4s ease-out both;
+  --animate-drip: drip 1.5s ease-in-out infinite both;
+  --animate-steam: steam 2.4s ease-out infinite both;
+  --animate-halo: halo 2.8s ease-in-out infinite;
 
   @keyframes rise-in {
     from { opacity: 0; transform: translateY(14px); }
@@ -84,7 +93,45 @@
     0%, 100% { opacity: 0.35; transform: translateY(-2px); }
     50% { opacity: 0.9; transform: translateY(2px); }
   }
+  @keyframes pop-in {
+    0% { opacity: 0; transform: scale(0.3); }
+    60% { opacity: 1; transform: scale(1.15); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes flow-segment {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+  }
+  @keyframes chev {
+    from { opacity: 0; transform: translate(-50%, -5px); }
+    to { opacity: 0.6; transform: translate(-50%, 0); }
+  }
+  @keyframes drip {
+    0% { opacity: 0; transform: translate(-50%, -3px); }
+    15% { opacity: 1; }
+    60% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, 20px); }
+  }
+  @keyframes steam {
+    0% { opacity: 0; transform: translateY(3px) scaleY(0.5); }
+    35% { opacity: 0.7; }
+    100% { opacity: 0; transform: translateY(-10px) scaleY(1.15); }
+  }
+  @keyframes halo {
+    0%, 100% { opacity: 0.18; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.14); }
+  }
 }
+
+/* Frozen until revealed: the animation clock (delay included) does not run. */
+[data-shown="false"] .seq {
+  animation-play-state: paused;
+}
+
 
 :root {
   --radius: 1rem;
@@ -146,9 +193,22 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-rise-in,
   .animate-bob,
-  .animate-arrow-drop {
+  .animate-arrow-drop,
+  .animate-pop-in,
+  .animate-slide-in,
+  .animate-flow-segment,
+  .animate-chev,
+  .animate-drip,
+  .animate-steam,
+  .animate-halo {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+  /* Droplets and steam only exist to carry motion, so drop them entirely. */
+  .flow-drip,
+  .flow-steam,
+  .flow-halo {
+    display: none !important;
   }
 }

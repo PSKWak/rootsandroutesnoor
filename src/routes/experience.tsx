@@ -32,29 +32,41 @@ function Experience() {
       <section className="mx-5 overflow-hidden rounded-3xl bg-card shadow-warm">
         <img src={roasting} alt="Hands roasting coffee beans in a clay pan over fire" width={1024} height={768} loading="lazy" className="h-48 w-full object-cover" />
         <div className="p-6">
-          <h2 className="text-2xl font-semibold">This Cup Has a Story</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Coffee is not only a product. It carries family, knowledge and local work.</p>
-          <ol className="mt-5 space-y-1">
-            {STORY.map((s, i) => (
-              <li key={s.t}>
-                <Reveal delay={i * 120}>
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl animate-bob" style={{ animationDelay: `${i * 500}ms` }} aria-hidden="true">{s.e}</span>
-                    <div>
-                      <p className="font-semibold">{s.t}</p>
-                      <p className="text-sm text-muted-foreground">{s.d}</p>
+          <Reveal>
+            <h2 className="text-2xl font-semibold">This Cup Has a Story</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Coffee is not only a product. It carries family, knowledge and local work.</p>
+          </Reveal>
+          <Reveal anim="animate-none" className="mt-5">
+            <ol>
+              {STORY.map((s, i) => {
+                const last = i === STORY.length - 1;
+                return (
+                  <li key={s.t}>
+                    <div className="flex items-start gap-3">
+                      <span className="relative flex h-9 w-8 shrink-0 items-center justify-center">
+                        <span className="seq relative block animate-pop-in text-2xl" style={{ animationDelay: `${i * 240}ms` }} aria-hidden="true">
+                          {last && <span className="flow-halo seq absolute -inset-1 rounded-full bg-primary animate-halo" />}
+                          <span className="seq block animate-bob" style={{ animationDelay: `${i * 420}ms` }}>{s.e}</span>
+                        </span>
+                      </span>
+                      <div className="seq flex-1 animate-slide-in" style={{ animationDelay: `${i * 240 + 70}ms` }}>
+                        <p className="font-semibold">{s.t}</p>
+                        <p className="text-sm text-muted-foreground">{s.d}</p>
+                      </div>
                     </div>
-                  </div>
-                </Reveal>
-                {i < STORY.length - 1 && (
-                  <Reveal delay={i * 120 + 80}>
-                    <p className="ml-3 text-muted-foreground animate-arrow-drop" style={{ animationDelay: `${i * 300}ms` }} aria-hidden="true">↓</p>
-                  </Reveal>
-                )}
-              </li>
-            ))}
-          </ol>
-          <Reveal delay={250}>
+                    {!last && (
+                      <div className="relative ml-[15px] h-7 w-0.5" aria-hidden="true">
+                        <span className="seq absolute inset-0 origin-top animate-flow-segment bg-primary/25" style={{ animationDelay: `${i * 240 + 150}ms` }} />
+                        <span className="flow-drip seq absolute left-1/2 top-0 h-1.5 w-1.5 rounded-full bg-primary animate-drip" style={{ animationDelay: `${i * 240 + 430}ms` }} />
+                        <span className="seq absolute bottom-0 left-1/2 animate-chev text-[10px] leading-none text-primary" style={{ animationDelay: `${i * 240 + 430}ms` }}>▾</span>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </Reveal>
+          <Reveal delay={1100}>
             <blockquote className="mt-6 border-l-4 border-primary pl-4 font-display text-lg">
               "Every cup carries a little piece of the people who helped make it."
               <footer className="mt-1 font-sans text-xs text-muted-foreground">— Noor's story</footer>

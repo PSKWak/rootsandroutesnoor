@@ -205,8 +205,12 @@ export function Recorder({ onDone, big, label = "Record" }: { onDone: (dataUrl: 
  * Lightweight scroll reveal: fades and rises its children once they enter the
  * viewport. Transform/opacity only, and the animation is switched off entirely
  * for visitors who prefer reduced motion (handled in styles.css).
+ *
+ * `anim` swaps the entrance animation. `data-shown` lets nested .seq pieces stay
+ * frozen (animation-play-state: paused) until this block is revealed, so a
+ * multi-step sequence plays in order instead of all at once on page load.
  */
-export function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; delay?: number; className?: string }) {
+export function Reveal({ children, delay = 0, className = "", anim = "animate-rise-in" }: { children: ReactNode; delay?: number; className?: string; anim?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [shown, setShown] = useState(false);
   useEffect(() => {
@@ -230,7 +234,7 @@ export function Reveal({ children, delay = 0, className = "" }: { children: Reac
     return () => io.disconnect();
   }, []);
   return (
-    <div ref={ref} className={`${className} ${shown ? "animate-rise-in" : "opacity-0"}`} style={shown ? { animationDelay: `${delay}ms` } : undefined}>
+    <div ref={ref} data-shown={shown} className={`${className} ${shown ? anim : "opacity-0"}`} style={shown ? { animationDelay: `${delay}ms` } : undefined}>
       {children}
     </div>
   );
