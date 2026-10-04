@@ -12,6 +12,7 @@
 - [x] "This Cup Has a Story": animated flow — each step pops in one after another, connector lines draw downward with a drop travelling along them, the cup step glows; frozen until scrolled into view, fully still under reduced motion
 
 - [x] Insights → simple actions Noor can mark I'll try / Done / Later
+- [x] Home impact section: concise photo rows (AI placeholder photos, labelled as such) replace the icon list
 ## Critical fixes brief (offline MVP)
 - [x] P1 offline badge, offline caching, offline message states, airplane-mode demo
 - [x] P2 public listing /noor-farm + QR + share
