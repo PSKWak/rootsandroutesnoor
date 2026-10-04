@@ -40,6 +40,19 @@ export type State = {
   feedback: Feedback[];
   sms: Sms[];
   visitorLanguage: string;
+  pickups: PickupRequest[];
+};
+
+/** A request only. Never auto-confirmed — Noor arranges transport herself. */
+export type PickupRequest = {
+  id: string;
+  name: string;
+  date: string;
+  guests: number;
+  location: string;
+  time: string;
+  notes: string;
+  at: number;
 };
 
 export const EXPERIENCES = [
@@ -55,6 +68,7 @@ const seed = (): State => ({
   messages: [],
   bookings: [],
   sms: [],
+  pickups: [],
   visitorLanguage: "English",
   feedback: [
     { id: "f1", rating: 5, text: "Meeting Noor was the highlight. She explained coffee processing so patiently.", tags: ["Meeting Noor", "Coffee"], at: Date.UTC(2026, 8, 2) },
@@ -228,6 +242,12 @@ export function sendNoorReply(audio: string) {
 
 export function approveTranslation(id: string) {
   set((s) => ({ ...s, messages: s.messages.map((m) => (m.id === id ? { ...m, status: "delivered" } : m)) }));
+}
+
+export function requestPickup(p: Omit<PickupRequest, "id" | "at">) {
+  const req: PickupRequest = { ...p, id: uid(), at: Date.now() };
+  set((s) => ({ ...s, pickups: [req, ...(s.pickups ?? [])] }));
+  smsToNoor(`Roots & Routes: Pickup request for ${p.date} ${p.time}, ${p.guests} visitor(s) from ${p.location}.`);
 }
 
 export function requestBooking(b: { experienceId: string; date: string; guests: number }) {
