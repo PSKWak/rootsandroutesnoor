@@ -113,8 +113,8 @@
   @keyframes drip {
     0% { opacity: 0; transform: translate(-50%, -3px); }
     15% { opacity: 1; }
-    75% { opacity: 1; }
-    100% { opacity: 0; transform: translate(-50%, 26px); }
+    60% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, 20px); }
   }
   @keyframes steam {
     0% { opacity: 0; transform: translateY(3px) scaleY(0.5); }
