@@ -78,6 +78,7 @@ export const TERRAIN = [
   { icon: "🥾", label: "Terrain", value: "[To be confirmed] — may be uneven or steep in some areas" },
   { icon: "🌧️", label: "Rain", value: "Paths may become muddy in rainy months" },
   { icon: "🚶", label: "Walking", value: "[Walking distance to be confirmed]" },
-  { icon: "👟", label: "Recommended", value: "Comfortable walking shoes" },
+  { icon: "🌦️", label: "Weather", value: "[To be confirmed] — highland mornings can be cool; bring a light jacket" },
+  { icon: "👟", label: "Recommended footwear", value: "Comfortable walking shoes" },
   { icon: "ℹ️", label: "Accessibility", value: "[To be confirmed] — some areas may have limited accessibility" },
 ];

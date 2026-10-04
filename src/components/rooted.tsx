@@ -5,7 +5,7 @@ import type { BookingStatus, MsgStatus } from "@/lib/store";
 
 export function Shell({ children, title, back }: { children: ReactNode; title?: string; back?: string }) {
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-background pb-24">
+    <div className="mx-auto min-h-screen max-w-md bg-background pb-36">
       {title && (
         <header className="sticky top-0 z-10 flex items-center gap-3 border-b bg-background/90 px-5 py-4 backdrop-blur">
           {back && (
@@ -13,12 +13,39 @@ export function Shell({ children, title, back }: { children: ReactNode; title?: 
               ←
             </Link>
           )}
-          <h1 className="text-xl font-semibold">{title}</h1>
+          <h1 className="min-w-0 truncate text-xl font-semibold">{title}</h1>
           <OnlineDot />
         </header>
       )}
+      <OfflineBanner />
       {children}
       <VisitorNav />
+    </div>
+  );
+}
+
+export function useOnline() {
+  const [on, setOn] = useState(true);
+  useEffect(() => {
+    const u = () => setOn(navigator.onLine);
+    u();
+    window.addEventListener("online", u);
+    window.addEventListener("offline", u);
+    return () => {
+      window.removeEventListener("online", u);
+      window.removeEventListener("offline", u);
+    };
+  }, []);
+  return on;
+}
+
+function OfflineBanner() {
+  const on = useOnline();
+  if (on) return null;
+  return (
+    <div role="status" className="mx-4 mt-3 rounded-2xl border-2 border-warning bg-card p-3 text-sm">
+      <p className="font-semibold">📱 Offline mode — no signal? Roots & Routes keeps the experience available.</p>
+      <p className="mt-1 text-muted-foreground">Noor's story, the coffee journey, the calendar and experiences still work. Messages and feedback are saved on this phone and sent when you're back online.</p>
     </div>
   );
 }
@@ -36,9 +63,9 @@ function OnlineDot() {
     };
   }, []);
   return (
-    <span className={`ml-auto flex items-center gap-1.5 text-xs ${on ? "text-success" : "text-warning"}`}>
-      <span className={`h-2 w-2 rounded-full ${on ? "bg-success" : "bg-warning"}`} />
-      {on ? "Online" : "Offline — messages queued"}
+    <span role="status" aria-live="polite" className={`ml-auto flex items-center gap-1.5 text-xs font-semibold ${on ? "text-success" : "text-warning"}`}>
+      <span aria-hidden="true" className={`h-2 w-2 rounded-full ${on ? "bg-success" : "bg-warning"}`} />
+      {on ? "Online" : "📱 Offline mode"}
     </span>
   );
 }
@@ -78,19 +105,19 @@ function VisitorNav() {
 }
 
 const MSG: Record<MsgStatus, { label: string; icon: typeof Check; cls: string }> = {
-  processing: { label: "Processing…", icon: Loader2, cls: "text-muted-foreground" },
+  processing: { label: "Sending…", icon: Loader2, cls: "text-muted-foreground" },
   transcribing: { label: "Transcribing…", icon: Loader2, cls: "text-muted-foreground" },
   translating: { label: "Translating…", icon: Languages, cls: "text-muted-foreground" },
   error: { label: "Error", icon: AlertCircle, cls: "text-destructive" },
   sent: { label: "Sent", icon: Check, cls: "text-muted-foreground" },
   delivered: { label: "Delivered", icon: CheckCheck, cls: "text-success" },
-  waiting: { label: "Waiting for connection", icon: Clock, cls: "text-warning" },
+  waiting: { label: "Saved offline", icon: Clock, cls: "text-warning" },
   review: { label: "Needs review", icon: AlertCircle, cls: "text-primary" },
 };
 export function MsgBadge({ status }: { status: MsgStatus }) {
   const { label, icon: Icon, cls } = MSG[status];
   return (
-    <span className={`inline-flex items-center gap-1 text-xs ${cls}`}>
+    <span role="status" className={`inline-flex items-center gap-1 text-xs ${cls}`}>
       <Icon className={`h-3.5 w-3.5 ${status === "processing" || status === "transcribing" ? "animate-spin" : ""}`} />
       {label}
     </span>
@@ -196,7 +223,8 @@ export function Recorder({ onDone, big, label = "Record" }: { onDone: (dataUrl: 
         {rec ? <Square className={big ? "h-7 w-7" : "h-5 w-5"} /> : <Mic className={big ? "h-8 w-8" : "h-5 w-5"} />}
         {rec ? <span>{big ? `Listening… ${time}` : time}</span> : big && label}
       </button>
-      {err && <p className="text-xs text-destructive">{err}</p>}
+      <span className="sr-only" aria-live="assertive">{rec ? "Recording" : ""}</span>
+      {err && <p role="alert" className="text-xs text-destructive">{err}</p>}
     </div>
   );
 }
@@ -237,5 +265,35 @@ export function Reveal({ children, delay = 0, className = "", anim = "animate-ri
     <div ref={ref} data-shown={shown} className={`${className} ${shown ? anim : "opacity-0"}`} style={shown ? { animationDelay: `${delay}ms` } : undefined}>
       {children}
     </div>
+  );
+}
+
+/** Speaks short text (insights, prompts) in the given language via ElevenLabs. Labelled as a computer voice. */
+export function ListenButton({ text, language, big }: { text: string; language?: string; big?: boolean }) {
+  const [state, setState] = useState<"idle" | "loading" | "error">("idle");
+  return (
+    <button
+      type="button"
+      aria-label={`Listen${language ? ` in ${language}` : ""}`}
+      disabled={state === "loading"}
+      onClick={async () => {
+        setState("loading");
+        const { speakTranslation, translateText } = await import("@/lib/voice.functions");
+        let t = text;
+        if (language && language !== "English") {
+          const tr = await translateText({ data: { text, targetLanguage: language } }).catch(() => null);
+          if (tr?.ok && tr.text) t = tr.text;
+        }
+        const r = await speakTranslation({ data: { text: t } }).catch(() => null);
+        if (r?.ok) {
+          setState("idle");
+          new Audio(r.audio).play().catch(() => {});
+        } else setState("error");
+      }}
+      className={`inline-flex items-center justify-center gap-2 rounded-full bg-secondary font-semibold text-secondary-foreground ${big ? "min-h-14 w-full px-5 text-lg" : "min-h-11 px-4 text-sm"}`}
+    >
+      {state === "loading" && <Loader2 className="h-5 w-5 animate-spin" />}
+      {state === "error" ? "Can't play now" : "🔊 Listen"}
+    </button>
   );
 }

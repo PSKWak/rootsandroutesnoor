@@ -7,7 +7,7 @@ import { ACTIVITIES, CALENDAR, LOCATION, TERRAIN, TRANSPORT, monthIndexFromDate,
 export const Route = createFileRoute("/visit")({
   head: () => ({
     meta: [
-      { title: "Plan your visit — Roots & Routes" },
+      { title: "Roots & Routes — Plan Your Visit" },
       { name: "description", content: "When to visit Noor's farm, what you can experience each month, and how to get there." },
       { property: "og:title", content: "Plan your visit — Roots & Routes" },
       { property: "og:description", content: "Seasonal farm calendar, getting here and know-before-you-go." },
@@ -44,22 +44,25 @@ function Visit() {
               key={c.month}
               onClick={() => setMi(i)}
               aria-pressed={i === mi}
-              className={`rounded-xl py-2 text-sm font-semibold ${i === mi ? "bg-primary text-primary-foreground" : "bg-card border"}`}
+              className={`relative rounded-xl py-2 text-sm font-semibold ${i === mi ? "bg-primary text-primary-foreground" : c.availability === "High" ? "border-2 border-primary bg-accent text-accent-foreground" : "bg-card border"}`}
+              aria-label={`${c.month}: ${ACTIVITIES[c.activity].label}${c.availability === "High" ? ", best season" : ""}`}
             >
               <span className="block text-lg">{ACTIVITIES[c.activity].icon}</span>
               {short(c.month)}
             </button>
           ))}
         </div>
+        <p className="mt-2 text-xs"><span className="mr-1 inline-block h-3 w-3 rounded border-2 border-primary bg-accent align-middle" /> Best season for visitors (sample)</p>
         <article className="mt-4 rounded-2xl border bg-card p-5" aria-live="polite">
-          <p className="text-sm text-muted-foreground">{m.month}</p>
+          <p className="text-sm text-muted-foreground">{m.month} · What's happening</p>
           <h3 className="mt-1 text-xl font-semibold">{a.icon} {a.label}</h3>
           <p className="mt-1">{a.desc}</p>
           <p className="mt-3 text-sm">
             {m.canParticipate ? "✋ Visitors can take part" : "👀 Visitors can watch and learn"} · Availability: <b>{m.availability}</b>
           </p>
           {m.rainy && <p className="mt-2 rounded-lg bg-muted px-3 py-2 text-sm">🌧️ Visiting in a rainy month? Paths may become muddy — check conditions before travelling.</p>}
-          <p className="mt-4 text-sm font-semibold">Available experiences</p>
+          <p className="mt-3 text-sm"><b>What to expect:</b> {m.rainy ? "Wetter weather, green terraces." : "Drier weather, good for walking."} {m.canParticipate ? "Hands-on farm work." : "A calmer visit."}</p>
+          <p className="mt-4 text-sm font-semibold">What's available</p>
           <ul className="mt-2 space-y-2">
             {EXPERIENCES.filter((e) => m.experiences.includes(e.id)).map((e) => (
               <li key={e.id} className="flex items-center justify-between rounded-xl bg-muted px-3 py-2">
@@ -87,7 +90,7 @@ function GettingHere() {
   const [open, setOpen] = useState(false);
   const [sent, setSent] = useState(false);
   return (
-    <section className="px-5 py-6">
+    <section id="getting-here" className="scroll-mt-20 px-5 py-6">
       <h2 className="text-2xl font-semibold">Getting here</h2>
       <div className="mt-3 rounded-2xl border bg-card p-5 text-sm">
         <p>📍 Nearest town: {LOCATION.nearestTown}</p>

@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import roasting from "@/assets/roasting.jpg";
 import { Reveal, Shell } from "@/components/rooted";
+import { BrewAnimation, TakeHome } from "@/components/brew";
 import { EXPERIENCES } from "@/lib/store";
 import { monthsFor } from "@/lib/farm-info";
 
 export const Route = createFileRoute("/experience")({
   head: () => ({
     meta: [
-      { title: "The Coffee Journey — Roots & Routes" },
+      { title: "Roots & Routes — Experience" },
       { name: "description", content: "From cherry to cup: the people and care behind Noor's coffee, and the farm experiences you can join." },
       { property: "og:title", content: "The Coffee Journey — Roots & Routes" },
       { property: "og:description", content: "This cup has a story. Meet the people behind it." },
@@ -75,6 +76,8 @@ function Experience() {
         </div>
       </section>
 
+      <BrewAnimation />
+
       <section className="px-5 py-8">
         <h2 className="text-2xl font-semibold">Join Noor on the farm</h2>
         <div className="mt-4 space-y-3">
@@ -84,7 +87,7 @@ function Experience() {
               <p className="mt-1 text-sm text-muted-foreground">{e.desc}</p>
               <p className="mt-2 text-xs text-muted-foreground">Best time (sample): {monthsFor(e.id).length === 12 ? "All year" : monthsFor(e.id).map((m) => m.slice(0, 3)).join(", ")}</p>
               <div className="mt-3 flex items-center justify-between text-sm">
-                <span>{e.duration} · {e.price}</span>
+                <span>{e.duration} · {e.price} (sample)</span>
                 <Link to="/book" search={{ exp: e.id }} className="rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground">Request</Link>
               </div>
             </article>
@@ -93,6 +96,7 @@ function Experience() {
         <Link to="/visit" className="mt-6 block rounded-full bg-primary py-4 text-center font-semibold text-primary-foreground">Plan your visit — when & how to get here</Link>
         <Link to="/chat" className="mt-3 block rounded-full border py-4 text-center font-semibold">Ask Noor a question</Link>
       </section>
+      <TakeHome />
     </Shell>
   );
 }

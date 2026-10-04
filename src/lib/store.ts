@@ -20,6 +20,10 @@ export type Booking = {
   experienceId: string;
   date: string;
   guests: number;
+  time?: string | undefined;
+  name?: string | undefined;
+  contact?: string | undefined;
+  message?: string | undefined;
   status: BookingStatus;
   altDate?: string | undefined;
   at: number;
@@ -30,6 +34,7 @@ export type Feedback = {
   text?: string | undefined;
   audio?: string | undefined;
   tags: string[];
+  photo?: string | undefined;
   at: number;
 };
 export type Sms = { id: string; text: string; at: number };
@@ -43,7 +48,12 @@ export type State = {
   pickups: PickupRequest[];
   /** Noor's choice for each suggested action, keyed by the action text. */
   insightActions: Record<string, ActionChoice>;
+  noorLanguage: string;
+  capacity: Capacity;
+  hostUnlocked: boolean;
 };
+/** Noor's own availability rules. Editable by Noor; bookings outside them are flagged, never auto-handled. */
+export type Capacity = { times: string[]; maxGuests: Record<string, number>; unavailable: string[]; availableDays: number[] };
 export type ActionChoice = "trying" | "done" | "later";
 export function setInsightAction(action: string, choice: ActionChoice | null) {
   set((s) => {
@@ -66,10 +76,12 @@ export type PickupRequest = {
   at: number;
 };
 
+/** Prices are SAMPLE values until Noor sets her own. */
+export const PRICES_ARE_SAMPLE = true;
 export const EXPERIENCES = [
-  { id: "walk", title: "Morning farm walk", duration: "2 hours", price: "$18 per person", desc: "Walk the terraces with Noor and pick ripe cherries by hand." },
-  { id: "process", title: "Bean to cup", duration: "Half day", price: "$35 per person", desc: "Pulp, wash, dry and roast coffee — then brew it together over fire." },
-  { id: "lunch", title: "Harvest lunch with family", duration: "3 hours", price: "$25 per person", desc: "Share a home-cooked highland meal and stories at Noor's table." },
+  { id: "walk", title: "Morning farm walk", duration: "2 hours", priceUsd: 18, price: "$18 per person", desc: "Walk the terraces with Noor and pick ripe cherries by hand." },
+  { id: "process", title: "Bean to cup", duration: "Half day", priceUsd: 35, price: "$35 per person", desc: "Pulp, wash, dry and roast coffee — then brew it together over fire." },
+  { id: "lunch", title: "Harvest lunch with family", duration: "3 hours", priceUsd: 25, price: "$25 per person", desc: "Share a home-cooked highland meal and stories at Noor's table." },
 ];
 
 export const FEEDBACK_TAGS = ["Coffee", "Farming", "Meeting Noor", "Local culture", "Community", "Farm walk"];
@@ -81,6 +93,9 @@ const seed = (): State => ({
   sms: [],
   pickups: [],
   insightActions: {},
+  noorLanguage: "Swahili",
+  capacity: { times: ["08:00", "10:00", "14:00"], maxGuests: { walk: 8, process: 6, lunch: 10 }, unavailable: [], availableDays: [1, 2, 3, 4, 5, 6] },
+  hostUnlocked: false,
   visitorLanguage: "English",
   feedback: [
     { id: "f1", rating: 5, text: "Meeting Noor was the highlight. She explained coffee processing so patiently.", tags: ["Meeting Noor", "Coffee"], at: Date.UTC(2026, 8, 2) },
@@ -141,8 +156,28 @@ function set(fn: (s: State) => State) {
 const uid = () => Math.random().toString(36).slice(2, 10);
 const online = () => typeof navigator === "undefined" || navigator.onLine;
 
-/** Noor's language for translations. Placeholder until the real language is confirmed. */
+/** Languages Noor can choose for herself. Only languages the translation service supports. */
+export const NOOR_LANGUAGES = ["Swahili", "English", "Amharic", "French", "Arabic", "Spanish"];
+/** @deprecated use state.noorLanguage */
 export const NOOR_LANGUAGE = "Swahili";
+export function setNoorLanguage(l: string) {
+  set((s) => ({ ...s, noorLanguage: l }));
+}
+/** Demo PIN for the host area — NOT real security. Replace with real sign-in before launch. */
+export const DEMO_HOST_PIN = "1234";
+export function unlockHost(pin: string) {
+  if (pin !== DEMO_HOST_PIN) return false;
+  set((s) => ({ ...s, hostUnlocked: true }));
+  return true;
+}
+export function lockHost() {
+  set((s) => ({ ...s, hostUnlocked: false }));
+}
+export function setCapacity(c: Capacity) {
+  set((s) => ({ ...s, capacity: c }));
+}
+/** Noor typically replies within this window. Configurable. */
+export const REPLY_TIME = "within 1 day";
 export const LANGUAGES = ["English", "Spanish", "French", "German", "Japanese", "Mandarin Chinese", "Arabic"];
 export function setVisitorLanguage(l: string) {
   set((s) => ({ ...s, visitorLanguage: l }));
@@ -150,10 +185,10 @@ export function setVisitorLanguage(l: string) {
 
 /** Suggested questions with demo replies written as Noor's sample answers (clearly labelled demo in the UI). */
 export const SUGGESTED = [
-  { q: "Why is coffee important to your family?", a: "Kahawa ni maisha yetu. Bibi yangu alipanda miti ya kwanza, na sasa mimi na binti yangu tunaitunza." },
-  { q: "What makes this coffee different?", a: "Tunachuma kila tunda kwa mkono linapoiva, na tunakausha juani polepole." },
-  { q: "What is your favorite part of the harvest?", a: "Asubuhi na ukungu, tunapochuma pamoja na kuimba. Ni wakati wa familia." },
-  { q: "Can I help roast the coffee?", a: "Ndiyo! Tunakaanga kwenye sufuria ya udongo juu ya moto. Utaona na kunusa kila hatua." },
+  { q: "Why did your family start growing coffee?", a: "Kahawa ni maisha yetu. Bibi yangu alipanda miti ya kwanza, na sasa mimi na binti yangu tunaitunza." },
+  { q: "What makes your coffee special?", a: "Tunachuma kila tunda kwa mkono linapoiva, na tunakausha juani polepole." },
+  { q: "What happens during harvest?", a: "Asubuhi na ukungu, tunapochuma pamoja na kuimba. Ni wakati wa familia." },
+  { q: "What is your favorite part of the farm?", a: "Ninapenda matuta ya juu asubuhi — unaona bonde lote na harufu ya maua ya kahawa." },
 ];
 
 function smsToNoor(text: string) {
@@ -180,7 +215,7 @@ async function processMessage(id: string) {
       data: {
         ...(m.audio ? { audio: m.audio } : { text: m.text ?? "" }),
         from: m.from,
-        targetLanguage: m.from === "visitor" ? NOOR_LANGUAGE : state.visitorLanguage,
+        targetLanguage: m.from === "visitor" ? state.noorLanguage : state.visitorLanguage,
       },
     });
     if (!r.ok) return patch(id, { status: "error", error: r.error });
@@ -246,6 +281,15 @@ export function markHeard(id: string) {
   patch(id, { heardByNoor: true });
 }
 
+/** Noor rejects a translation that isn't what she meant; she then records or types again. */
+export function discardReply(id: string) {
+  set((s) => ({ ...s, messages: s.messages.filter((m) => m.id !== id) }));
+}
+export function sendNoorText(text: string) {
+  const m: Message = { id: uid(), from: "noor", text, status: online() ? "processing" : "waiting", at: Date.now() };
+  set((s) => ({ ...s, messages: [...s.messages, m] }));
+  void processMessage(m.id);
+}
 export function sendNoorReply(audio: string) {
   const m: Message = { id: uid(), from: "noor", audio, status: online() ? "processing" : "waiting", at: Date.now() };
   set((s) => ({ ...s, messages: [...s.messages, m] }));
@@ -262,7 +306,21 @@ export function requestPickup(p: Omit<PickupRequest, "id" | "at">) {
   smsToNoor(`Roots & Routes: Pickup request for ${p.date} ${p.time}, ${p.guests} visitor(s) from ${p.location}.`);
 }
 
-export function requestBooking(b: { experienceId: string; date: string; guests: number }) {
+export function estimateTotal(experienceId: string, guests: number) {
+  const e = EXPERIENCES.find((x) => x.id === experienceId);
+  return e ? e.priceUsd * guests : 0;
+}
+/** Warnings against Noor's capacity rules. Shown to Noor; never auto-declines. */
+export function capacityIssues(b: Pick<Booking, "experienceId" | "date" | "guests">, c: Capacity) {
+  const out: string[] = [];
+  if (c.unavailable.includes(b.date)) out.push("You marked this day as unavailable");
+  const d = new Date(b.date);
+  if (!Number.isNaN(d.getTime()) && !c.availableDays.includes(d.getUTCDay())) out.push("Not one of your open days");
+  const max = c.maxGuests[b.experienceId];
+  if (max && b.guests > max) out.push(`More than your limit of ${max} guests`);
+  return out;
+}
+export function requestBooking(b: { experienceId: string; date: string; guests: number; time?: string; name?: string; contact?: string; message?: string }) {
   const booking: Booking = { ...b, id: uid(), status: "requested", at: Date.now() };
   set((s) => ({ ...s, bookings: [booking, ...s.bookings] }));
   setTimeout(() => {
@@ -270,7 +328,7 @@ export function requestBooking(b: { experienceId: string; date: string; guests: 
       ...s,
       bookings: s.bookings.map((x) => (x.id === booking.id && x.status === "requested" ? { ...x, status: "awaiting" } : x)),
     }));
-    smsToNoor(`Roots & Routes: Booking request for ${b.date}, ${b.guests} guest(s). Reply on the shared phone: accept, decline or new time.`);
+    smsToNoor(`Roots & Routes: Booking request from ${b.name ?? "a visitor"} for ${b.date}${b.time ? " " + b.time : ""}, ${b.guests} guest(s). Reply on the shared phone: accept, decline or new time.`);
   }, 1000);
 }
 

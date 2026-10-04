@@ -146,7 +146,7 @@
   --secondary: oklch(0.42 0.07 150);
   --secondary-foreground: oklch(0.98 0.01 85);
   --muted: oklch(0.93 0.02 75);
-  --muted-foreground: oklch(0.5 0.03 50);
+  --muted-foreground: oklch(0.42 0.03 50);
   --accent: oklch(0.85 0.1 75);
   --accent-foreground: oklch(0.3 0.05 45);
   --destructive: oklch(0.55 0.2 27);
@@ -211,4 +211,19 @@
   .flow-halo {
     display: none !important;
   }
+}
+
+/* Bean-to-cup brew micro-animation (transform/opacity only). */
+@keyframes brew-bean { 0%,100% { transform: translateY(0) rotate(0) } 50% { transform: translateY(-4px) rotate(20deg) } }
+@keyframes brew-pour { 0% { transform: scaleY(0); opacity: 0 } 30% { opacity: 1 } 100% { transform: scaleY(1); opacity: 1 } }
+@keyframes brew-fill { from { transform: scaleY(0) } to { transform: scaleY(1) } }
+@keyframes brew-steam { 0% { transform: translateY(4px); opacity: 0 } 50% { opacity: .7 } 100% { transform: translateY(-12px); opacity: 0 } }
+.brew-bean { animation: brew-bean 1.6s ease-in-out infinite; }
+.brew-pour { transform-origin: top; animation: brew-pour 1.2s ease-out .6s both; }
+.brew-fill { transform-origin: bottom; animation: brew-fill 1.8s ease-out 1.4s both; }
+.brew-steam { animation: brew-steam 2.4s ease-in-out 3s infinite both; }
+[data-shown="false"] .brew-bean, [data-shown="false"] .brew-pour, [data-shown="false"] .brew-fill, [data-shown="false"] .brew-steam { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .brew-bean, .brew-pour, .brew-fill { animation: none !important; transform: none !important; opacity: 1 !important; }
+  .brew-steam { display: none !important; }
 }

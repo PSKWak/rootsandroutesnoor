@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Check, Clock, Loader2, Sprout, Star } from "lucide-react";
-import { AudioPlayer, Shell } from "@/components/rooted";
+import { AudioPlayer, ListenButton, Shell } from "@/components/rooted";
 import { SMALL_SAMPLE, feedbackThemes, setInsightAction, useStore, type ActionChoice } from "@/lib/store";
 import { summarizeFeedback, type InsightCard } from "@/lib/insights.functions";
 
@@ -20,10 +20,10 @@ export const Route = createFileRoute("/noor/insights")({
 });
 
 const KIND: Record<InsightCard["kind"], { emoji: string; label: string; cls: string }> = {
-  love: { emoji: "❤️", label: "What people love", cls: "bg-card" },
-  wish: { emoji: "💡", label: "What people wish were different", cls: "bg-card" },
+  love: { emoji: "❤️", label: "What visitors love", cls: "bg-card" },
+  wish: { emoji: "💡", label: "What visitors want", cls: "bg-card" },
   recurring: { emoji: "🔁", label: "What keeps coming up", cls: "bg-card" },
-  next: { emoji: "🚀", label: "What you could try next", cls: "bg-accent text-accent-foreground" },
+  next: { emoji: "🚀", label: "What Noor could try next", cls: "bg-accent text-accent-foreground" },
 };
 
 const CHOICES: { v: ActionChoice; label: string; icon: typeof Check }[] = [
@@ -59,6 +59,7 @@ function ActionBox({ action }: { action: string }) {
 
 function Insights() {
   const fb = useStore((s) => s.feedback);
+  const lang = useStore((s) => s.noorLanguage);
   const chosen = useStore((s) => s.insightActions ?? {});
   const demoCount = fb.filter((f) => f.id.length <= 3).length; // seed items: f1–f5
   const withText = fb.filter((f) => f.text);
@@ -74,7 +75,7 @@ function Insights() {
   return (
     <Shell title="Visitor Insights" back="/noor">
       <div className="space-y-4 px-5 py-6">
-        <p className="text-lg font-semibold">What visitors say — and what you can do</p>
+        <h2 className="text-2xl font-semibold">What Visitors Are Saying</h2>
         <div className="rounded-3xl bg-muted p-5">
           <p className="text-4xl font-bold">{avg} <Star className="inline h-7 w-7 fill-accent text-primary" /></p>
           <p className="text-sm">from {fb.length} visitors{demoCount ? ` · ${demoCount} are sample visitor feedback (demo)` : ""}</p>
@@ -98,24 +99,26 @@ function Insights() {
 
         <p className="text-xs text-muted-foreground">AI suggestions based only on the feedback below. You decide what to do.</p>
 
-        {q.isLoading && <p className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Reading feedback…</p>}
+        {q.isLoading && <p role="status" className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Reading feedback…</p>}
 
         {q.data?.ok
-          ? q.data.cards.map((c) => (
+          ? q.data.cards.filter((c) => c.kind !== "recurring").map((c) => (
               <div key={c.kind} className={`space-y-2 rounded-3xl border p-5 shadow-warm ${KIND[c.kind].cls}`}>
                 <p className="text-sm font-semibold">{KIND[c.kind].emoji} {KIND[c.kind].label}</p>
                 <p className="text-xl font-semibold">{c.title}</p>
                 <p>{c.explanation}</p>
                 <p className="text-sm font-semibold">Mentioned by {c.mentions} of {withText.length} visitors</p>
                 {c.example && <p className="text-sm italic opacity-80">"{c.example}"</p>}
+                <ListenButton text={`${c.title}. ${c.explanation}`} language={lang} />
                 {c.action && <ActionBox action={c.action} />}
               </div>
             ))
-          : !q.isLoading && (
+          : (
               <ul className="space-y-3">
                 {themes.map((t) => (
                   <li key={t.label} className="space-y-3 rounded-3xl border bg-card p-5">
                     <p className="text-lg"><span className="text-3xl font-bold text-primary">{t.count}</span> visitors {t.label}</p>
+                    <ListenButton text={`${t.count} visitors ${t.label}`} language={lang} />
                     <ActionBox action={t.action} />
                   </li>
                 ))}
@@ -134,6 +137,7 @@ function Insights() {
               {f.id.length <= 3 && <span className="text-[10px] font-semibold uppercase text-muted-foreground">Sample (demo)</span>}
             </div>
             {f.text && <p>{f.text}</p>}
+            {f.photo && <img src={f.photo} alt="Photo shared by a visitor" className="max-h-48 w-full rounded-xl object-cover" />}
             {f.audio && <AudioPlayer src={f.audio} label="Listen" />}
           </div>
         ))}
