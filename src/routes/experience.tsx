@@ -67,7 +67,9 @@ function Experience() {
                   </div>
                 </Reveal>
                 {i < STORY.length - 1 && (
-                  <p className="ml-3 text-muted-foreground animate-arrow-drop" style={{ animationDelay: `${i * 300}ms` }} aria-hidden="true">↓</p>
+                  <Reveal delay={i * 120 + 80}>
+                    <p className="ml-3 text-muted-foreground animate-arrow-drop" style={{ animationDelay: `${i * 300}ms` }} aria-hidden="true">↓</p>
+                  </Reveal>
                 )}
               </li>
             ))}
