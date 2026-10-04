@@ -136,6 +136,7 @@ function Insights() {
               <p className="text-primary">{"★".repeat(f.rating)}</p>
               {f.id.length <= 3 && <span className="text-[10px] font-semibold uppercase text-muted-foreground">Sample (demo)</span>}
             </div>
+            {f.from && <p className="text-xs text-muted-foreground">{f.from}</p>}
             {f.text && <p>{f.text}</p>}
             {f.photo && <img src={f.photo} alt="Photo shared by a visitor" className="max-h-48 w-full rounded-xl object-cover" />}
             {f.audio && <AudioPlayer src={f.audio} label="Listen" />}
