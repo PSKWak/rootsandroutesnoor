@@ -36,7 +36,7 @@
 - [x] B5 booking: no past dates, closed/off days blocked, contact checked, group capped at Noor's limit
 - [x] B7 feedback prompts no longer glued into text; B8 honest saved/sent wording; consent off by default
 - [x] B14 plurals on booking screen
-- [ ] B1 voice: hide mic until STT key works (blocked: ElevenLabs key with Speech-to-Text)
+- [ ] B1 voice: switched to Lovable AI speech-to-text (done); B3 read-aloud now Lovable AI
 - [ ] B2 real translation for reply labels; B3 silent buttons; B6 +255 check; B9 spinner timeout; B10 tried actions leave list
 - [ ] B11 shared host guard + auto-logout; B12 SMS reply confirm; B13 pickups in counters
 - [ ] D1 ExperienceCard; D2 ShareBar; D4 pickup prefill; D5 Ask Noor entry points; D6 DEMO_MODE flag; D7 inbox labels
