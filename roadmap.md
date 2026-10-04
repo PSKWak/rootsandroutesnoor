@@ -12,3 +12,16 @@
 - [x] "This Cup Has a Story": animated flow — each step pops in one after another, connector lines draw downward with a drop travelling along them, the cup step glows; frozen until scrolled into view, fully still under reduced motion
 
 - [x] Insights → simple actions Noor can mark I'll try / Done / Later
+## Critical fixes brief (offline MVP)
+- [ ] P1 offline badge, offline caching, offline message states, airplane-mode demo
+- [ ] P2 public listing /noor-farm + QR + share
+- [ ] P3/P11 booking: name, contact, time, review, estimated total, Noor capacity settings, message visitor
+- [ ] P4 host data model + "more hosts coming soon"
+- [ ] P5/P6/P7 Noor overview big cards, Listen buttons, My language picker, "not what I meant"
+- [ ] P8/P9 AI translation labels, reply-time, waiting for Noor, ask another question
+- [ ] P10/P16 calendar all 12 months, getting here weather/footwear
+- [ ] P12 feedback photo + new prompts
+- [ ] P13 insights 3 categories
+- [ ] P14/P15 take the story home, support Noor (prototype)
+- [ ] P17 SMS fallback prototype label
+- [ ] P18 a11y/contrast, P19 host PIN login, P20 reset confirm, P21 bottom padding, P22 titles, P23 brew animation
