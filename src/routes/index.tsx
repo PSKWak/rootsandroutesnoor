@@ -1,8 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Loader2, Sprout, MessageCircle, Mic, Users, User, Store, Home as HomeIcon, Leaf, QrCode as QrIcon } from "lucide-react";
+import { Loader2, Sprout, MessageCircle, Mic, QrCode as QrIcon } from "lucide-react";
 import hero from "@/assets/farm-hero.jpg";
 import noor from "@/assets/noor.jpg";
+import visitorImg from "@/assets/impact-visitor.jpg";
+import harvestImg from "@/assets/impact-harvest.jpg";
+import cookingImg from "@/assets/impact-cooking.jpg";
+import communityImg from "@/assets/impact-community.jpg";
 import { AudioPlayer, Shell } from "@/components/rooted";
 import { speakTranslation } from "@/lib/voice.functions";
 
@@ -50,11 +54,11 @@ function HearStory() {
 }
 
 const IMPACT = [
-  { icon: User, who: "You", what: "experience local culture first-hand" },
-  { icon: Leaf, who: "Noor", what: "earns income from hosting" },
-  { icon: Users, who: "Local workers", what: "take part in the tourism economy" },
-  { icon: Store, who: "Local suppliers", what: "provide food, transport and products" },
-  { icon: HomeIcon, who: "Community", what: "gains opportunity and reasons to keep local knowledge alive" },
+  { img: visitorImg, who: "You", what: "experience local culture first-hand" },
+  { img: noor, who: "Noor", what: "earns income from hosting" },
+  { img: harvestImg, who: "Local workers", what: "share in the tourism economy" },
+  { img: cookingImg, who: "Local suppliers", what: "provide food and products" },
+  { img: communityImg, who: "Community", what: "keeps local knowledge alive" },
 ];
 
 
@@ -100,16 +104,17 @@ function Home() {
       <section className="mx-5 rounded-3xl bg-muted p-6">
         <h2 className="text-2xl font-semibold">Your Visit Goes Beyond the Farm</h2>
         <ul className="mt-4 space-y-3">
-          {IMPACT.map(({ icon: Icon, who, what }) => (
-            <li key={who} className="flex items-start gap-3">
-              <Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-              <span><b>{who}</b> — {what}</span>
+          {IMPACT.map(({ img, who, what }) => (
+            <li key={who} className="flex items-center gap-3">
+              <img src={img} alt="" width={640} height={640} loading="lazy" className="h-12 w-12 shrink-0 rounded-xl object-cover shadow-warm" />
+              <span className="text-sm leading-snug"><b className="text-base">{who}</b> — {what}</span>
             </li>
           ))}
         </ul>
-        <p className="mt-5 font-display text-lg leading-snug">
-          When visitors connect directly with local hosts, tourism can become more than a transaction — it can support livelihoods, stories, and local knowledge.
+        <p className="mt-4 font-display text-lg leading-snug">
+          Tourism can be more than a transaction — it can support livelihoods, stories, and local knowledge.
         </p>
+        <p className="mt-3 text-xs text-muted-foreground">Photos are illustrative placeholders, not Noor's community.</p>
       </section>
 
 
