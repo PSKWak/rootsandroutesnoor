@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Send, Smartphone, Volume2, Loader2, ArrowDown } from "lucide-react";
 import noor from "@/assets/noor.jpg";
-import { AudioPlayer, MsgBadge, Recorder, Shell } from "@/components/rooted";
-import { LANGUAGES, NOOR_LANGUAGE, SUGGESTED, retryMessage, sendVisitorMessage, setVisitorLanguage, useStore } from "@/lib/store";
+import { AudioPlayer, MsgBadge, Recorder, Shell, useOnline } from "@/components/rooted";
+import { LANGUAGES, REPLY_TIME, SUGGESTED, retryMessage, sendVisitorMessage, setVisitorLanguage, useStore } from "@/lib/store";
 import { speakTranslation } from "@/lib/voice.functions";
 
 export const Route = createFileRoute("/chat")({
@@ -48,7 +48,12 @@ function Chat() {
   const messages = useStore((s) => s.messages);
   const sms = useStore((s) => s.sms);
   const lang = useStore((s) => s.visitorLanguage);
+  const NOOR_LANGUAGE = useStore((s) => s.noorLanguage);
+  const on = useOnline();
   const [text, setText] = useState("");
+  const [more, setMore] = useState(false);
+  const hasNoorReply = messages.some((m) => m.from === "noor" && m.status === "delivered");
+  const lastVisitor = [...messages].reverse().find((m) => m.from === "visitor");
   const visible = messages.filter((m) => m.from === "visitor" || m.status === "delivered");
 
   return (
@@ -72,11 +77,17 @@ function Chat() {
           <span className="rounded-full bg-secondary px-2 py-1 text-secondary-foreground">Noor · {NOOR_LANGUAGE}</span>
         </div>
 
-        {visible.length === 0 && (
+        <p className="text-center text-sm">⏱️ Noor usually replies {REPLY_TIME}.</p>
+        {!on && (
+          <p role="status" className="rounded-2xl border-2 border-warning bg-card p-3 text-sm font-semibold">
+            You're offline. Your message is saved on this phone and will be sent when you're back online.
+          </p>
+        )}
+        {(visible.length === 0 || more) && (
           <div className="space-y-2">
-            <p className="text-sm font-semibold">Try asking:</p>
+            <p className="text-sm font-semibold">Suggested questions</p>
             {SUGGESTED.map((s) => (
-              <button key={s.q} onClick={() => sendVisitorMessage({ text: s.q })} className="block w-full rounded-2xl border bg-card p-4 text-left text-base">
+              <button key={s.q} onClick={() => { sendVisitorMessage({ text: s.q }); setMore(false); }} className="block w-full rounded-2xl border bg-card p-4 text-left text-base">
                 "{s.q}"
               </button>
             ))}
@@ -94,12 +105,15 @@ function Chat() {
               {(m.status === "translating" || m.status === "transcribing" || m.status === "processing") && (
                 <p className="flex items-center justify-end gap-2 text-xs text-muted-foreground"><Loader2 className="h-3 w-3 animate-spin" /> Translating for Noor…</p>
               )}
-              {m.translated && <p className="rounded-xl bg-card p-2 text-xs text-muted-foreground">Noor reads ({NOOR_LANGUAGE}): {m.translated}</p>}
+              {m.translated && <p className="rounded-xl bg-card p-2 text-xs text-muted-foreground"><b>Translated for Noor</b> · AI · {NOOR_LANGUAGE}: {m.translated}</p>}
               <div className="flex items-center justify-end gap-3">
                 {m.error && <span className="text-xs text-destructive">{m.error}</span>}
                 {m.status === "error" && <button onClick={() => retryMessage(m.id)} className="text-xs font-semibold text-primary">Retry</button>}
                 <MsgBadge status={m.status} />
               </div>
+              {m.id === lastVisitor?.id && m.status === "delivered" && !hasNoorReply && (
+                <p className="text-right text-xs font-semibold">Sent → Waiting for Noor · We'll show her reply here when she answers.</p>
+              )}
             </div>
           ) : (
             <div key={m.id} className="mr-6 space-y-3 rounded-2xl rounded-bl-sm border bg-card p-4">
@@ -114,18 +128,21 @@ function Chat() {
                 <>
                   <p className="text-base">{m.translated}</p>
                   <HearTranslation text={m.translated} />
-                  <p className="text-xs text-muted-foreground">Translated by AI into {lang}{m.audio ? " · the voice above is Noor's own" : ""}</p>
+                  <p className="text-xs text-muted-foreground"><b>Translated back for you</b> · Translated by AI into {lang}{m.audio ? " · the voice above is Noor's own" : ""}</p>
                 </>
               )}
             </div>
           ),
         )}
 
+        {visible.length > 0 && !more && (
+          <button onClick={() => setMore(true)} className="w-full rounded-full border bg-card py-3 font-semibold">Ask another question</button>
+        )}
         {sms[0] && (
           <div className="flex gap-3 rounded-2xl border-2 border-dashed border-secondary p-3 text-sm">
             <Smartphone className="h-5 w-5 shrink-0 text-secondary" />
             <div>
-              <p className="font-semibold">SMS sent to Noor's phone (simulated)</p>
+              <p className="font-semibold">SMS fallback — prototype (no real SMS sent)</p>
               <p className="text-muted-foreground">"{sms[0].text}"</p>
             </div>
           </div>
@@ -159,7 +176,7 @@ function Chat() {
           )}
         </form>
       </div>
-      <div className="h-44" />
+      <div className="h-56" aria-hidden="true" />
     </Shell>
   );
 }

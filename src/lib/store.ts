@@ -185,10 +185,10 @@ export function setVisitorLanguage(l: string) {
 
 /** Suggested questions with demo replies written as Noor's sample answers (clearly labelled demo in the UI). */
 export const SUGGESTED = [
-  { q: "Why is coffee important to your family?", a: "Kahawa ni maisha yetu. Bibi yangu alipanda miti ya kwanza, na sasa mimi na binti yangu tunaitunza." },
-  { q: "What makes this coffee different?", a: "Tunachuma kila tunda kwa mkono linapoiva, na tunakausha juani polepole." },
-  { q: "What is your favorite part of the harvest?", a: "Asubuhi na ukungu, tunapochuma pamoja na kuimba. Ni wakati wa familia." },
-  { q: "Can I help roast the coffee?", a: "Ndiyo! Tunakaanga kwenye sufuria ya udongo juu ya moto. Utaona na kunusa kila hatua." },
+  { q: "Why did your family start growing coffee?", a: "Kahawa ni maisha yetu. Bibi yangu alipanda miti ya kwanza, na sasa mimi na binti yangu tunaitunza." },
+  { q: "What makes your coffee special?", a: "Tunachuma kila tunda kwa mkono linapoiva, na tunakausha juani polepole." },
+  { q: "What happens during harvest?", a: "Asubuhi na ukungu, tunapochuma pamoja na kuimba. Ni wakati wa familia." },
+  { q: "What is your favorite part of the farm?", a: "Ninapenda matuta ya juu asubuhi — unaona bonde lote na harufu ya maua ya kahawa." },
 ];
 
 function smsToNoor(text: string) {
