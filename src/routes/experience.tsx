@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import roasting from "@/assets/roasting.jpg";
 import { Reveal, Shell } from "@/components/rooted";
 import { EXPERIENCES } from "@/lib/store";
+import { monthsFor } from "@/lib/farm-info";
 
 export const Route = createFileRoute("/experience")({
   head: () => ({
@@ -90,6 +91,7 @@ function Experience() {
             <article key={e.id} className="rounded-2xl border bg-card p-5">
               <h3 className="text-lg font-semibold">{e.title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{e.desc}</p>
+              <p className="mt-2 text-xs text-muted-foreground">Best time (sample): {monthsFor(e.id).length === 12 ? "All year" : monthsFor(e.id).map((m) => m.slice(0, 3)).join(", ")}</p>
               <div className="mt-3 flex items-center justify-between text-sm">
                 <span>{e.duration} · {e.price}</span>
                 <Link to="/book" search={{ exp: e.id }} className="rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground">Request</Link>
@@ -97,7 +99,8 @@ function Experience() {
             </article>
           ))}
         </div>
-        <Link to="/chat" className="mt-6 block rounded-full border py-4 text-center font-semibold">Ask Noor a question</Link>
+        <Link to="/visit" className="mt-6 block rounded-full bg-primary py-4 text-center font-semibold text-primary-foreground">Plan your visit — when & how to get here</Link>
+        <Link to="/chat" className="mt-3 block rounded-full border py-4 text-center font-semibold">Ask Noor a question</Link>
       </section>
     </Shell>
   );
