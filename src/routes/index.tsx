@@ -57,7 +57,6 @@ const IMPACT = [
   { icon: HomeIcon, who: "Community", what: "gains opportunity and reasons to keep local knowledge alive" },
 ];
 
-const FLOW = ["Discover", "Connect", "Translate", "Experience", "Feel", "Feedback", "Learn", "Improve", "Impact"];
 
 function Home() {
   return (
@@ -113,17 +112,6 @@ function Home() {
         </p>
       </section>
 
-      <section className="px-5 py-8">
-        <h2 className="text-xl font-semibold">How it works</h2>
-        <div className="mt-3 flex flex-wrap gap-2 text-sm">
-          {FLOW.map((f, i) => (
-            <span key={f} className="flex items-center gap-2">
-              <span className="rounded-full bg-card px-3 py-1 font-semibold border">{f}</span>
-              {i < FLOW.length - 1 && <span className="text-muted-foreground">→</span>}
-            </span>
-          ))}
-        </div>
-      </section>
 
       <section className="mx-5 mb-6 rounded-2xl border border-dashed p-4 text-center text-sm">
         <p className="font-semibold">Demo: choose a view</p>

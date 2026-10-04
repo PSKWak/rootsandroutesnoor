@@ -7,3 +7,5 @@
 - [x] Navigation: visitor 4 tabs, Noor 4 tabs, role selector
 - [x] Coffee journey: lightweight fade-in/rise animation, reduced-motion safe
 - [x] Seasonal calendar, Getting Here, Know Before You Go, Plan Your Visit (/visit) — awaiting Noor's real seasons, location, transport, terrain
+- [x] Home: removed the "How it works" flow strip (user request) — do not re-add
+
