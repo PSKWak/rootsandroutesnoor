@@ -205,7 +205,7 @@ function deliver(id: string) {
     patch(id, { status: "delivered" });
     const m = state.messages.find((x) => x.id === id);
     if (m?.from === "visitor")
-      smsToNoor(`Rooted: New ${m.audio ? "voice " : ""}message from a visitor. Open Rooted on the shared phone to listen.`);
+      smsToNoor(`Roots & Routes: New ${m.audio ? "voice " : ""}message from a visitor. Open Rooted on the shared phone to listen.`);
   }, 1200);
 }
 
@@ -238,7 +238,7 @@ export function requestBooking(b: { experienceId: string; date: string; guests: 
       ...s,
       bookings: s.bookings.map((x) => (x.id === booking.id && x.status === "requested" ? { ...x, status: "awaiting" } : x)),
     }));
-    smsToNoor(`Rooted: Booking request for ${b.date}, ${b.guests} guest(s). Reply on the shared phone: accept, decline or new time.`);
+    smsToNoor(`Roots & Routes: Booking request for ${b.date}, ${b.guests} guest(s). Reply on the shared phone: accept, decline or new time.`);
   }, 1000);
 }
 
