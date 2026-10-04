@@ -45,7 +45,7 @@ function Experience() {
                     <div className="flex items-start gap-3">
                       <span className="relative flex h-9 w-8 shrink-0 items-center justify-center">
                         <span className="seq relative block animate-pop-in text-2xl" style={{ animationDelay: `${i * 240}ms` }} aria-hidden="true">
-                          {last && <span className="flow-halo seq absolute -inset-2 rounded-full bg-primary animate-halo" />}
+                          {last && <span className="flow-halo seq absolute -inset-1 rounded-full bg-primary animate-halo" />}
                           <span className="seq block animate-bob" style={{ animationDelay: `${i * 420}ms` }}>{s.e}</span>
                         </span>
                       </span>
