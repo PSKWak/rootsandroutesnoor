@@ -46,7 +46,6 @@ function HearTranslation({ text }: { text: string }) {
 
 function Chat() {
   const messages = useStore((s) => s.messages);
-  const sms = useStore((s) => s.sms);
   const lang = useStore((s) => s.visitorLanguage);
   const NOOR_LANGUAGE = useStore((s) => s.noorLanguage);
   const on = useOnline();
