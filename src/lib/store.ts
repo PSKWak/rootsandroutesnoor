@@ -205,7 +205,7 @@ function deliver(id: string) {
     patch(id, { status: "delivered" });
     const m = state.messages.find((x) => x.id === id);
     if (m?.from === "visitor")
-      smsToNoor(`Roots & Routes: New ${m.audio ? "voice " : ""}message from a visitor. Open Rooted on the shared phone to listen.`);
+      smsToNoor(`Roots & Routes: New ${m.audio ? "voice " : ""}message from a visitor. Open the app on the shared phone to listen.`);
   }, 1200);
 }
 
