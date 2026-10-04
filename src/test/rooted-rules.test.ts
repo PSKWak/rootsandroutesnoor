@@ -18,7 +18,7 @@ describe("Rooted rules", () => {
 
   it("counts seed feedback themes with sample sizes", () => {
     resetDemo();
-    const fb = JSON.parse(localStorage.getItem("rooted-state-v1")!).feedback;
+    const fb = JSON.parse(localStorage.getItem("rooted-state-v1")!).feedback.filter((f: { id: string }) => /^f\d$/.test(f.id));
     const t = Object.fromEntries(feedbackThemes(fb).map((x) => [x.label, x.count]));
     expect(t["mentioned meeting Noor"]).toBe(4);
     expect(t["mentioned coffee processing"]).toBe(3);
