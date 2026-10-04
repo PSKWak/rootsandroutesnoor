@@ -77,8 +77,8 @@
   --animate-slide-in: slide-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-flow-segment: flow-segment 0.45s ease-out both;
   --animate-chev: chev 0.4s ease-out both;
-  --animate-drip: drip 1.5s ease-in-out infinite;
-  --animate-steam: steam 2.4s ease-out infinite;
+  --animate-drip: drip 1.5s ease-in-out infinite both;
+  --animate-steam: steam 2.4s ease-out infinite both;
   --animate-halo: halo 2.8s ease-in-out infinite;
 
   @keyframes rise-in {
