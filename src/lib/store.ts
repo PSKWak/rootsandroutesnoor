@@ -12,6 +12,7 @@ export type Message = {
   heardByNoor?: boolean | undefined;
   transcript?: string | undefined;
   error?: string | undefined;
+  demo?: boolean | undefined;
 };
 export type BookingStatus = "requested" | "awaiting" | "confirmed" | "declined" | "alternative";
 export type Booking = {
@@ -38,6 +39,7 @@ export type State = {
   bookings: Booking[];
   feedback: Feedback[];
   sms: Sms[];
+  visitorLanguage: string;
 };
 
 export const EXPERIENCES = [
@@ -53,6 +55,7 @@ const seed = (): State => ({
   messages: [],
   bookings: [],
   sms: [],
+  visitorLanguage: "English",
   feedback: [
     { id: "f1", rating: 5, text: "Meeting Noor was the highlight. She explained coffee processing so patiently.", tags: ["Meeting Noor", "Coffee"], at: Date.UTC(2026, 8, 2) },
     { id: "f2", rating: 5, text: "Loved the farm walk at sunrise. I wish we could learn roasting too.", tags: ["Farm walk", "Meeting Noor"], at: Date.UTC(2026, 8, 9) },
@@ -114,7 +117,18 @@ const online = () => typeof navigator === "undefined" || navigator.onLine;
 
 /** Noor's language for translations. Placeholder until the real language is confirmed. */
 export const NOOR_LANGUAGE = "Swahili";
-export const VISITOR_LANGUAGE = "English";
+export const LANGUAGES = ["English", "Spanish", "French", "German", "Japanese", "Mandarin Chinese", "Arabic"];
+export function setVisitorLanguage(l: string) {
+  set((s) => ({ ...s, visitorLanguage: l }));
+}
+
+/** Suggested questions with demo replies written as Noor's sample answers (clearly labelled demo in the UI). */
+export const SUGGESTED = [
+  { q: "Why is coffee important to your family?", a: "Kahawa ni maisha yetu. Bibi yangu alipanda miti ya kwanza, na sasa mimi na binti yangu tunaitunza." },
+  { q: "What makes this coffee different?", a: "Tunachuma kila tunda kwa mkono linapoiva, na tunakausha juani polepole." },
+  { q: "What is your favorite part of the harvest?", a: "Asubuhi na ukungu, tunapochuma pamoja na kuimba. Ni wakati wa familia." },
+  { q: "Can I help roast the coffee?", a: "Ndiyo! Tunakaanga kwenye sufuria ya udongo juu ya moto. Utaona na kunusa kila hatua." },
+];
 
 function smsToNoor(text: string) {
   set((s) => ({ ...s, sms: [{ id: uid(), text, at: Date.now() }, ...s.sms] }));
@@ -140,7 +154,7 @@ async function processMessage(id: string) {
       data: {
         ...(m.audio ? { audio: m.audio } : { text: m.text ?? "" }),
         from: m.from,
-        targetLanguage: m.from === "visitor" ? NOOR_LANGUAGE : VISITOR_LANGUAGE,
+        targetLanguage: m.from === "visitor" ? NOOR_LANGUAGE : state.visitorLanguage,
       },
     });
     if (!r.ok) return patch(id, { status: "error", error: r.error });
@@ -148,10 +162,19 @@ async function processMessage(id: string) {
       transcript: r.transcript || undefined,
       translated: r.translated || undefined,
       // Noor's translated reply always waits for her family's review before the visitor sees it
-      status: m.from === "noor" ? "review" : "sent",
+      status: m.from === "noor" ? (m.demo ? "delivered" : "review") : "sent",
       error: "error" in r ? r.error : undefined,
     });
-    if (m.from === "visitor") deliver(id);
+    if (m.from === "visitor") {
+      deliver(id);
+      const demo = SUGGESTED.find((x) => x.q === m.text);
+      if (demo)
+        setTimeout(() => {
+          const reply: Message = { id: uid(), from: "noor", text: demo.a, demo: true, status: "translating", at: Date.now() };
+          set((s) => ({ ...s, messages: [...s.messages, reply] }));
+          void processMessage(reply.id);
+        }, 2500);
+    }
   } catch (e) {
     patch(id, { status: online() ? "error" : "waiting", error: online() ? "Could not process. Tap retry." : undefined });
     console.error(e);
