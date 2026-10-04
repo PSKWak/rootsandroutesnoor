@@ -25,7 +25,7 @@ function wrapperOf(text: string) {
 describe("coffee journey reveal motion", () => {
   afterEach(() => {
     mockPrefersReducedMotion(false);
-    delete (globalThis as unknown as Record<string, unknown>).IntersectionObserver;
+    delete (globalThis as unknown as Record<string, unknown>)["IntersectionObserver"];
   });
 
   it("shows every step straight away when the visitor prefers reduced motion", () => {
@@ -42,7 +42,7 @@ describe("coffee journey reveal motion", () => {
 
   it("hides a step until it scrolls into view when motion is allowed", () => {
     mockPrefersReducedMotion(false);
-    (globalThis as unknown as Record<string, unknown>).IntersectionObserver = class {
+    (globalThis as unknown as Record<string, unknown>)["IntersectionObserver"] = class {
       observe() {}
       unobserve() {}
       disconnect() {}
@@ -57,7 +57,7 @@ describe("coffee journey reveal motion", () => {
 
   it("never leaves a step hidden when the browser cannot observe scrolling", () => {
     mockPrefersReducedMotion(false);
-    expect(typeof (globalThis as unknown as Record<string, unknown>).IntersectionObserver).toBe("undefined");
+    expect(typeof (globalThis as unknown as Record<string, unknown>)["IntersectionObserver"]).toBe("undefined");
     render(
       <Reveal>
         <p>Harvesting</p>
