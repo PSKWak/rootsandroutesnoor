@@ -32,9 +32,17 @@ function Book() {
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [message, setMessage] = useState("");
+  const [touched, setTouched] = useState(false);
   const [step, setStep] = useState<"form" | "review" | "sent">("form");
   const e = EXPERIENCES.find((x) => x.id === experienceId)!;
-  const total = estimateTotal(experienceId, guests);
+  const cap = useStore((s) => s.capacity);
+  const max = cap.maxGuests[experienceId] ?? 20;
+  const today = new Date().toISOString().slice(0, 10);
+  const total = estimateTotal(experienceId, Math.min(guests, max));
+  const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  const dayIssue = !date ? "" : date < today ? "Please choose a future date." : cap.unavailable.includes(date) || !cap.availableDays.includes(new Date(date + "T00:00:00Z").getUTCDay()) ? "Noor isn't available that day." : "";
+  const contactOk = /^\S+@\S+\.\S+$/.test(contact.trim()) || /^\+?\d{7,15}$/.test(contact.replace(/[\s()-]/g, ""));
+  const errors = [dayIssue, guests > max ? `This experience takes up to ${max} guests.` : "", contact && !contactOk ? "Enter an email or a phone number like +255 712 345 678." : ""].filter(Boolean);
 
   return (
     <Shell title="Request a visit" back="/">
@@ -52,7 +60,7 @@ function Book() {
               <div key={k} className="flex justify-between gap-3"><dt className="text-muted-foreground">{k}</dt><dd className="text-right font-semibold">{v}</dd></div>
             ))}
             <div className="border-t pt-2">
-              <p className="text-sm">${e.priceUsd} × {guests} visitors</p>
+              <p className="text-sm">${e.priceUsd} × {plural(guests, "visitor")}</p>
               <p className="text-xl font-bold">Estimated total: ${total}</p>
               {PRICES_ARE_SAMPLE && <p className="text-xs text-muted-foreground">Sample price — Noor will confirm the real price.</p>}
             </div>
@@ -67,7 +75,7 @@ function Book() {
           <button onClick={() => setStep("form")} className="w-full rounded-full border py-3 font-semibold">Edit</button>
         </div>
       ) : (
-        <form className="space-y-5 px-5 py-6" onSubmit={(ev) => { ev.preventDefault(); setStep("review"); }}>
+        <form className="space-y-5 px-5 py-6" noValidate onSubmit={(ev) => { ev.preventDefault(); if (!date || !time || !name.trim() || !contactOk || errors.length) { setTouched(true); return; } setStep("review"); }}>
           <fieldset className="space-y-2">
             <legend className="mb-2 text-sm font-semibold">Experience</legend>
             {EXPERIENCES.map((x) => (
@@ -79,7 +87,7 @@ function Book() {
             ))}
           </fieldset>
           <div className="grid grid-cols-2 gap-3">
-            <label className="text-sm font-semibold">Date<input type="date" required value={date} onChange={(x) => setDate(x.target.value)} className={field} /></label>
+            <label className="text-sm font-semibold">Date<input type="date" min={today} required value={date} onChange={(x) => setDate(x.target.value)} className={field} /></label>
             <label className="text-sm font-semibold">Preferred time
               <select required value={time} onChange={(x) => setTime(x.target.value)} className={field}>
                 <option value="">Choose</option>
@@ -87,11 +95,17 @@ function Book() {
               </select>
             </label>
           </div>
-          <label className="block text-sm font-semibold">Group size<input type="number" min={1} max={20} required value={guests} onChange={(x) => setGuests(Math.max(1, +x.target.value))} className={field} /></label>
+          <label className="block text-sm font-semibold">Group size<input type="number" min={1} max={max} required value={guests} onChange={(x) => setGuests(Math.min(max, Math.max(1, +x.target.value || 1)))} className={field} /></label>
           <label className="block text-sm font-semibold">Your name<input required value={name} onChange={(x) => setName(x.target.value)} className={field} /></label>
           <label className="block text-sm font-semibold">How can Noor reach you? (phone, WhatsApp or email)<input required value={contact} onChange={(x) => setContact(x.target.value)} className={field} /></label>
           <label className="block text-sm font-semibold">Message (optional)<textarea rows={2} value={message} onChange={(x) => setMessage(x.target.value)} className="mt-1 w-full rounded-xl border bg-card p-3" /></label>
-          <p className="rounded-2xl bg-muted p-3 text-sm"><b>{e.title}</b><br />${e.priceUsd} × {guests} visitors · <b>Estimated total: ${total}</b></p>
+          {(errors.length > 0 || touched) && (
+            <ul role="alert" className="space-y-1 rounded-2xl border-2 border-destructive bg-card p-3 text-sm font-semibold text-destructive">
+              {errors.map((m) => <li key={m}>{m}</li>)}
+              {touched && (!date || !time || !name.trim() || !contact) && <li>Please fill in date, time, name and contact.</li>}
+            </ul>
+          )}
+          <p className="rounded-2xl bg-muted p-3 text-sm"><b>{e.title}</b><br />${e.priceUsd} × {plural(guests, "visitor")} · <b>Estimated total: ${total}</b></p>
           <button className="w-full rounded-full bg-primary py-4 text-lg font-semibold text-primary-foreground shadow-warm">Review request</button>
           <p className="text-center text-xs text-muted-foreground">This is a request, not a booking. Only Noor can confirm it.</p>
         </form>
@@ -107,7 +121,7 @@ function Book() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="font-semibold">{x?.title}</p>
-                    <p className="text-sm text-muted-foreground">{b.date}{b.time ? ` · ${b.time}` : ""} · {b.guests} guest(s)</p>
+                    <p className="text-sm text-muted-foreground">{b.date}{b.time ? ` · ${b.time}` : ""} · {plural(b.guests, "guest")}</p>
                   </div>
                   <BookingBadge status={b.status} />
                 </div>

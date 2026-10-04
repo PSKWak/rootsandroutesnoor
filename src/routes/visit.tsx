@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Shell } from "@/components/rooted";
 import { EXPERIENCES, requestPickup } from "@/lib/store";
-import { ACTIVITIES, CALENDAR, LOCATION, TERRAIN, TRANSPORT, monthIndexFromDate, monthsFor } from "@/lib/farm-info";
+import { ACTIVITIES, CALENDAR, LOCATION, TERRAIN, TRANSPORT, monthsFor } from "@/lib/farm-info";
 
 export const Route = createFileRoute("/visit")({
   head: () => ({

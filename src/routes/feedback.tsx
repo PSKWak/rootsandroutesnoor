@@ -37,7 +37,7 @@ function FeedbackPage() {
       {done ? (
         <div className="px-5 py-12 text-center">
           <h2 className="text-3xl font-semibold">Thank you</h2>
-          <p className="mt-2 text-lg">{sent?.sync === "synced" ? "Sent to Noor." : sent?.sync === "local" || sent?.sync === "waiting" ? "Saved on this phone. It will send when you have signal." : "Saved — sending…"}</p>
+          <p className="mt-2 text-lg">{sent?.sync === "synced" ? "Sent to Noor." : sent?.sync === "saved" || sent?.sync === "waiting" ? "Saved on this phone. It will send when you have signal." : "Saved — sending…"}</p>
           {sent?.sync && (
             <p role="status" aria-live="polite" className="mx-auto mt-4 inline-flex items-center gap-2 rounded-full border bg-card px-4 py-2 font-semibold">
               {sent.sync === "synced" ? "✅" : sent.sync === "failed" ? "⚠️" : sent.sync === "waiting" ? "🔄" : "📱"} {SYNC_LABEL[sent.sync]}
