@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import roasting from "@/assets/roasting.jpg";
-import { Shell } from "@/components/rooted";
+import { Reveal, Shell } from "@/components/rooted";
 import { EXPERIENCES } from "@/lib/store";
 
 export const Route = createFileRoute("/experience")({
@@ -39,9 +39,11 @@ function Experience() {
         <ol className="space-y-4 border-l-2 border-accent pl-5">
           {JOURNEY.map((j, i) => (
             <li key={j.t} className="relative">
-              <span className="absolute -left-[29px] flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{i + 1}</span>
-              <h3 className="font-semibold">{j.t}</h3>
-              <p className="text-sm text-muted-foreground">{j.d}</p>
+              <span className="absolute -left-[29px] flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground animate-rise-in" style={{ animationDelay: `${i * 90}ms` }}>{i + 1}</span>
+              <Reveal delay={i * 90}>
+                <h3 className="font-semibold">{j.t}</h3>
+                <p className="text-sm text-muted-foreground">{j.d}</p>
+              </Reveal>
             </li>
           ))}
         </ol>
@@ -55,21 +57,27 @@ function Experience() {
           <ol className="mt-5 space-y-1">
             {STORY.map((s, i) => (
               <li key={s.t}>
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">{s.e}</span>
-                  <div>
-                    <p className="font-semibold">{s.t}</p>
-                    <p className="text-sm text-muted-foreground">{s.d}</p>
+                <Reveal delay={i * 120}>
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl animate-bob" style={{ animationDelay: `${i * 500}ms` }} aria-hidden="true">{s.e}</span>
+                    <div>
+                      <p className="font-semibold">{s.t}</p>
+                      <p className="text-sm text-muted-foreground">{s.d}</p>
+                    </div>
                   </div>
-                </div>
-                {i < STORY.length - 1 && <p className="ml-3 text-muted-foreground">↓</p>}
+                </Reveal>
+                {i < STORY.length - 1 && (
+                  <p className="ml-3 text-muted-foreground animate-arrow-drop" style={{ animationDelay: `${i * 300}ms` }} aria-hidden="true">↓</p>
+                )}
               </li>
             ))}
           </ol>
-          <blockquote className="mt-6 border-l-4 border-primary pl-4 font-display text-lg">
-            "Every cup carries a little piece of the people who helped make it."
-            <footer className="mt-1 font-sans text-xs text-muted-foreground">— Noor's story</footer>
-          </blockquote>
+          <Reveal delay={250}>
+            <blockquote className="mt-6 border-l-4 border-primary pl-4 font-display text-lg">
+              "Every cup carries a little piece of the people who helped make it."
+              <footer className="mt-1 font-sans text-xs text-muted-foreground">— Noor's story</footer>
+            </blockquote>
+          </Reveal>
         </div>
       </section>
 

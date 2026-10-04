@@ -200,3 +200,37 @@ export function Recorder({ onDone, big, label = "Record" }: { onDone: (dataUrl: 
     </div>
   );
 }
+
+/**
+ * Lightweight scroll reveal: fades and rises its children once they enter the
+ * viewport. Transform/opacity only, and the animation is switched off entirely
+ * for visitors who prefer reduced motion (handled in styles.css).
+ */
+export function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; delay?: number; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setShown(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setShown(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -5% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className={`${className} ${shown ? "animate-rise-in" : "opacity-0"}`} style={shown ? { animationDelay: `${delay}ms` } : undefined}>
+      {children}
+    </div>
+  );
+}
