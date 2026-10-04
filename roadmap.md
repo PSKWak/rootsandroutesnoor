@@ -5,3 +5,4 @@
 - [x] Ask Noor: language picker, suggested questions, translation flow, demo reply, listen to translation
 - [x] Feedback prompts + "shared with Noor"; Noor AI insight cards (labeled demo data)
 - [x] Navigation: visitor 4 tabs, Noor 4 tabs, role selector
+- [x] Coffee journey: lightweight fade-in/rise animation, reduced-motion safe
