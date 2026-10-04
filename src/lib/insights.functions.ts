@@ -7,6 +7,7 @@ const Card = z.object({
   explanation: z.string(),
   mentions: z.number().int().min(0),
   example: z.string().optional(),
+  action: z.string().optional(),
 });
 export type InsightCard = z.infer<typeof Card>;
 
@@ -25,7 +26,7 @@ export const summarizeFeedback = createServerFn({ method: "POST" })
       body: JSON.stringify({
         model: "openai/gpt-6-astra",
         instructions:
-          "Reply with only a JSON object, no markdown. You help a coffee farmer (Noor) understand visitor feedback. Use ONLY the feedback given. Write very simple words. Return JSON: {\"cards\":[...]} with exactly 4 cards, kinds love, wish, recurring, next (one each). Each: title (max 6 words), explanation (one short sentence), mentions (exact count of feedback items supporting it), example (short quote copied from feedback, optional). For 'next', give a gentle suggestion. Never exaggerate; if evidence is thin say so.",
+          "Reply with only a JSON object, no markdown. You help a coffee farmer (Noor) understand visitor feedback. Use ONLY the feedback given. Write very simple words. Return JSON: {\"cards\":[...]} with exactly 4 cards, kinds love, wish, recurring, next (one each). Each: title (max 6 words), explanation (one short sentence), mentions (exact count of feedback items supporting it), example (short quote copied from feedback, optional), action (ONE small, concrete thing Noor can do soon, max 10 words, starts with a verb, no cost or tech needed, e.g. 'Show guests how you roast coffee'). For 'next', give a gentle suggestion. Never exaggerate; if evidence is thin say so.",
         input: `Visitor feedback (return json):\n${list || "(no feedback)"}`,
       }),
     });
