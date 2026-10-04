@@ -20,7 +20,7 @@
 - [x] P4 host data model + "more hosts coming soon"
 - [x] P5/P6/P7 Noor overview big cards, Listen buttons, My language picker, "not what I meant"
 - [x] P8/P9 AI translation labels, reply-time, waiting for Noor, ask another question
-- [x] P10/P16 calendar all 12 months, getting here weather/footwear
+- [x] P10/P16 calendar all 12 months, getting here walking/footwear
 - [x] P12 feedback photo + new prompts
 - [x] P13 insights 3 categories
 - [x] P14/P15 take the story home, support Noor (prototype)
@@ -42,3 +42,5 @@
 - [ ] D1 ExperienceCard; D2 ShareBar; D4 pickup prefill; D5 Ask Noor entry points; D6 DEMO_MODE flag; D7 inbox labels
 - [ ] Full-interface translation + Arabic RTL; PIN masking/lockout; accessibility items
 - [ ] Real farm details from Noor (blocked: waiting on Noor)
+- [x] Getting here filled in with Noor's detail: 2-hectare farm, about 1 km of walking; weather row removed from Know before you go
+- [ ] Still placeholder in Getting here / Know before you go (blocked: waiting on Noor): nearest town, farm location, transport routes, pickup point, terrain, accessibility
