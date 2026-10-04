@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as ExperienceRouteImport } from './routes/experience'
+import { Route as FarmRouteImport } from './routes/farm'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as NoorRouteImport } from './routes/noor'
 import { Route as VisitRouteImport } from './routes/visit'
@@ -39,6 +40,11 @@ const ChatRoute = ChatRouteImport.update({
 const ExperienceRoute = ExperienceRouteImport.update({
   id: '/experience',
   path: '/experience',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FarmRoute = FarmRouteImport.update({
+  id: '/farm',
+  path: '/farm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedbackRoute = FeedbackRouteImport.update({
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/book': typeof BookRoute
   '/chat': typeof ChatRoute
   '/experience': typeof ExperienceRoute
+  '/farm': typeof FarmRoute
   '/feedback': typeof FeedbackRoute
   '/noor': typeof NoorRouteWithChildren
   '/visit': typeof VisitRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/book': typeof BookRoute
   '/chat': typeof ChatRoute
   '/experience': typeof ExperienceRoute
+  '/farm': typeof FarmRoute
   '/feedback': typeof FeedbackRoute
   '/visit': typeof VisitRoute
   '/noor/bookings': typeof NoorBookingsRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/book': typeof BookRoute
   '/chat': typeof ChatRoute
   '/experience': typeof ExperienceRoute
+  '/farm': typeof FarmRoute
   '/feedback': typeof FeedbackRoute
   '/noor': typeof NoorRouteWithChildren
   '/visit': typeof VisitRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/book'
     | '/chat'
     | '/experience'
+    | '/farm'
     | '/feedback'
     | '/noor'
     | '/visit'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/book'
     | '/chat'
     | '/experience'
+    | '/farm'
     | '/feedback'
     | '/visit'
     | '/noor/bookings'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '/book'
     | '/chat'
     | '/experience'
+    | '/farm'
     | '/feedback'
     | '/noor'
     | '/visit'
@@ -162,6 +174,7 @@ export interface RootRouteChildren {
   BookRoute: typeof BookRoute
   ChatRoute: typeof ChatRoute
   ExperienceRoute: typeof ExperienceRoute
+  FarmRoute: typeof FarmRoute
   FeedbackRoute: typeof FeedbackRoute
   NoorRoute: typeof NoorRouteWithChildren
   VisitRoute: typeof VisitRoute
@@ -195,6 +208,13 @@ declare module '@tanstack/react-router' {
       path: '/experience'
       fullPath: '/experience'
       preLoaderRoute: typeof ExperienceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/farm': {
+      id: '/farm'
+      path: '/farm'
+      fullPath: '/farm'
+      preLoaderRoute: typeof FarmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feedback': {
@@ -270,6 +290,7 @@ const rootRouteChildren: RootRouteChildren = {
   BookRoute: BookRoute,
   ChatRoute: ChatRoute,
   ExperienceRoute: ExperienceRoute,
+  FarmRoute: FarmRoute,
   FeedbackRoute: FeedbackRoute,
   NoorRoute: NoorRouteWithChildren,
   VisitRoute: VisitRoute,

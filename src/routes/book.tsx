@@ -8,7 +8,7 @@ export const Route = createFileRoute("/book")({
   validateSearch: (s) => z.object({ exp: z.string().optional() }).parse(s),
   head: () => ({
     meta: [
-      { title: "Request a visit — Roots & Routes" },
+      { title: "Roots & Routes — Request a Visit" },
       { name: "description", content: "Request a farm experience. Only Noor confirms bookings." },
       { property: "og:title", content: "Request a visit — Roots & Routes" },
       { property: "og:description", content: "Book time on Noor's coffee farm." },

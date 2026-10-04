@@ -7,7 +7,7 @@ import { monthsFor } from "@/lib/farm-info";
 export const Route = createFileRoute("/experience")({
   head: () => ({
     meta: [
-      { title: "The Coffee Journey — Roots & Routes" },
+      { title: "Roots & Routes — Experience" },
       { name: "description", content: "From cherry to cup: the people and care behind Noor's coffee, and the farm experiences you can join." },
       { property: "og:title", content: "The Coffee Journey — Roots & Routes" },
       { property: "og:description", content: "This cup has a story. Meet the people behind it." },

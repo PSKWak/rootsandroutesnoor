@@ -7,7 +7,7 @@ import { FEEDBACK_TAGS, submitFeedback } from "@/lib/store";
 export const Route = createFileRoute("/feedback")({
   head: () => ({
     meta: [
-      { title: "How was your visit? — Roots & Routes" },
+      { title: "Roots & Routes — Feedback" },
       { name: "description", content: "Share text or voice feedback about your visit to Noor's farm." },
       { property: "og:title", content: "Feedback — Roots & Routes" },
       { property: "og:description", content: "Tell Noor how your experience went." },

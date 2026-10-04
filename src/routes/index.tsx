@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Loader2, Sprout, MessageCircle, Mic, Users, User, Store, Home as HomeIcon, Leaf } from "lucide-react";
+import { Loader2, Sprout, MessageCircle, Mic, Users, User, Store, Home as HomeIcon, Leaf, QrCode as QrIcon } from "lucide-react";
 import hero from "@/assets/farm-hero.jpg";
 import noor from "@/assets/noor.jpg";
 import { AudioPlayer, Shell } from "@/components/rooted";
@@ -9,7 +9,7 @@ import { speakTranslation } from "@/lib/voice.functions";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Roots & Routes — Meet Noor, coffee farmer in the Ondera Highlands" },
+      { title: "Roots & Routes — Home" },
       { name: "description", content: "Experience coffee from the people who grow it. Ask Noor questions across languages and visit her family farm." },
       { property: "og:title", content: "Roots & Routes — Meet Noor" },
       { property: "og:description", content: "Experience coffee from the people who grow it." },
@@ -113,13 +113,16 @@ function Home() {
       </section>
 
 
-      <section className="mx-5 mb-6 rounded-2xl border border-dashed p-4 text-center text-sm">
-        <p className="font-semibold">Demo: choose a view</p>
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <Link to="/chat" className="rounded-full bg-primary py-3 font-semibold text-primary-foreground">Continue as Visitor</Link>
-          <Link to="/noor" className="rounded-full bg-secondary py-3 font-semibold text-secondary-foreground">Continue as Noor</Link>
-        </div>
+      <section className="mx-5 mt-6 rounded-3xl border bg-card p-5 text-center">
+        <QrIcon className="mx-auto h-8 w-8 text-primary" />
+        <p className="mt-2 text-lg font-semibold">Scan to meet Noor</p>
+        <p className="text-sm text-muted-foreground">Share Noor's farm page or print its QR code.</p>
+        <Link to="/farm" className="mt-3 inline-block rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground">Open Noor's farm page</Link>
       </section>
+
+      <footer className="mx-5 my-8 flex justify-center text-sm">
+        <Link to="/noor" className="font-semibold text-muted-foreground underline">Host login</Link>
+      </footer>
     </Shell>
   );
 }

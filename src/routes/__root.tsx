@@ -118,11 +118,19 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+/** Visitor pages kept ready in memory so they still open if the signal drops. */
+const OFFLINE_ROUTES = ["/", "/farm", "/experience", "/visit", "/chat", "/book", "/feedback"] as const;
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
   useEffect(() => {
     hydrateStore();
-  }, []);
+    const t = setTimeout(() => {
+      OFFLINE_ROUTES.forEach((to) => void router.preloadRoute({ to }).catch(() => {}));
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>

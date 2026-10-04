@@ -9,7 +9,7 @@ import { speakTranslation } from "@/lib/voice.functions";
 export const Route = createFileRoute("/chat")({
   head: () => ({
     meta: [
-      { title: "Ask Noor — Roots & Routes" },
+      { title: "Roots & Routes — Ask Noor" },
       { name: "description", content: "Ask Noor a question by text or voice. AI helps you understand each other across languages." },
       { property: "og:title", content: "Ask Noor — Roots & Routes" },
       { property: "og:description", content: "Talk with a coffee farmer across languages. Noor answers, AI translates." },
