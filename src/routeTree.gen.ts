@@ -21,6 +21,7 @@ import { Route as NoorIndexRouteImport } from './routes/noor.index'
 import { Route as NoorBookingsRouteImport } from './routes/noor.bookings'
 import { Route as NoorInboxRouteImport } from './routes/noor.inbox'
 import { Route as NoorInsightsRouteImport } from './routes/noor.insights'
+import { Route as NoorSmsRouteImport } from './routes/noor.sms'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +83,11 @@ const NoorInsightsRoute = NoorInsightsRouteImport.update({
   path: '/insights',
   getParentRoute: () => NoorRoute,
 } as any)
+const NoorSmsRoute = NoorSmsRouteImport.update({
+  id: '/sms',
+  path: '/sms',
+  getParentRoute: () => NoorRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/noor/bookings': typeof NoorBookingsRoute
   '/noor/inbox': typeof NoorInboxRoute
   '/noor/insights': typeof NoorInsightsRoute
+  '/noor/sms': typeof NoorSmsRoute
   '/noor/': typeof NoorIndexRoute
 }
 export interface FileRoutesByTo {
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/noor/bookings': typeof NoorBookingsRoute
   '/noor/inbox': typeof NoorInboxRoute
   '/noor/insights': typeof NoorInsightsRoute
+  '/noor/sms': typeof NoorSmsRoute
   '/noor': typeof NoorIndexRoute
 }
 export interface FileRoutesById {
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/noor/bookings': typeof NoorBookingsRoute
   '/noor/inbox': typeof NoorInboxRoute
   '/noor/insights': typeof NoorInsightsRoute
+  '/noor/sms': typeof NoorSmsRoute
   '/noor/': typeof NoorIndexRoute
 }
 export interface FileRouteTypes {
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/noor/bookings'
     | '/noor/inbox'
     | '/noor/insights'
+    | '/noor/sms'
     | '/noor/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/noor/bookings'
     | '/noor/inbox'
     | '/noor/insights'
+    | '/noor/sms'
     | '/noor'
   id:
     | '__root__'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/noor/bookings'
     | '/noor/inbox'
     | '/noor/insights'
+    | '/noor/sms'
     | '/noor/'
   fileRoutesById: FileRoutesById
 }
@@ -266,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NoorInsightsRouteImport
       parentRoute: typeof NoorRoute
     }
+    '/noor/sms': {
+      id: '/noor/sms'
+      path: '/sms'
+      fullPath: '/noor/sms'
+      preLoaderRoute: typeof NoorSmsRouteImport
+      parentRoute: typeof NoorRoute
+    }
   }
 }
 
@@ -273,6 +292,7 @@ interface NoorRouteChildren {
   NoorBookingsRoute: typeof NoorBookingsRoute
   NoorInboxRoute: typeof NoorInboxRoute
   NoorInsightsRoute: typeof NoorInsightsRoute
+  NoorSmsRoute: typeof NoorSmsRoute
   NoorIndexRoute: typeof NoorIndexRoute
 }
 
@@ -280,6 +300,7 @@ const NoorRouteChildren: NoorRouteChildren = {
   NoorBookingsRoute: NoorBookingsRoute,
   NoorInboxRoute: NoorInboxRoute,
   NoorInsightsRoute: NoorInsightsRoute,
+  NoorSmsRoute: NoorSmsRoute,
   NoorIndexRoute: NoorIndexRoute,
 }
 
