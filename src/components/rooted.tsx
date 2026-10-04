@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Check, CheckCheck, Clock, AlertCircle, Mic, Square, Play, Pause, Home, MessageCircle, CalendarDays, Star, Sprout } from "lucide-react";
+import { Check, CheckCheck, Clock, AlertCircle, Mic, Square, Play, Pause, Home, MessageCircle, CalendarDays, Star, Sprout, Loader2, Languages, RotateCcw } from "lucide-react";
 import type { BookingStatus, MsgStatus } from "@/lib/store";
 
 export function Shell({ children, title, back }: { children: ReactNode; title?: string; back?: string }) {
@@ -72,6 +72,10 @@ function VisitorNav() {
 }
 
 const MSG: Record<MsgStatus, { label: string; icon: typeof Check; cls: string }> = {
+  processing: { label: "Processing…", icon: Loader2, cls: "text-muted-foreground" },
+  transcribing: { label: "Transcribing…", icon: Loader2, cls: "text-muted-foreground" },
+  translating: { label: "Translating…", icon: Languages, cls: "text-muted-foreground" },
+  error: { label: "Error", icon: AlertCircle, cls: "text-destructive" },
   sent: { label: "Sent", icon: Check, cls: "text-muted-foreground" },
   delivered: { label: "Delivered", icon: CheckCheck, cls: "text-success" },
   waiting: { label: "Waiting for connection", icon: Clock, cls: "text-warning" },
@@ -81,7 +85,7 @@ export function MsgBadge({ status }: { status: MsgStatus }) {
   const { label, icon: Icon, cls } = MSG[status];
   return (
     <span className={`inline-flex items-center gap-1 text-xs ${cls}`}>
-      <Icon className="h-3.5 w-3.5" />
+      <Icon className={`h-3.5 w-3.5 ${status === "processing" || status === "transcribing" ? "animate-spin" : ""}`} />
       {label}
     </span>
   );
@@ -121,11 +125,19 @@ export function AudioPlayer({ src, label = "Voice message", onPlay, big }: { src
   );
 }
 
-export function Recorder({ onDone, big, label = "Hold to talk" }: { onDone: (dataUrl: string) => void; big?: boolean; label?: string }) {
+export function Recorder({ onDone, big, label = "Record" }: { onDone: (dataUrl: string) => void; big?: boolean; label?: string }) {
   const [rec, setRec] = useState<MediaRecorder | null>(null);
+  const [secs, setSecs] = useState(0);
+  const [preview, setPreview] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  useEffect(() => {
+    if (!rec) return;
+    const t = setInterval(() => setSecs((x) => x + 1), 1000);
+    return () => clearInterval(t);
+  }, [rec]);
   const start = async () => {
     setErr(null);
+    setSecs(0);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const r = new MediaRecorder(stream);
@@ -134,7 +146,7 @@ export function Recorder({ onDone, big, label = "Hold to talk" }: { onDone: (dat
       r.onstop = () => {
         stream.getTracks().forEach((t) => t.stop());
         const fr = new FileReader();
-        fr.onload = () => onDone(fr.result as string);
+        fr.onload = () => setPreview(fr.result as string);
         fr.readAsDataURL(new Blob(chunks, { type: r.mimeType }));
       };
       r.start();
@@ -147,6 +159,24 @@ export function Recorder({ onDone, big, label = "Hold to talk" }: { onDone: (dat
     rec?.stop();
     setRec(null);
   };
+  const time = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
+  const btn = big ? "flex-1 py-5 text-lg" : "px-4 py-2 text-sm";
+
+  if (preview)
+    return (
+      <div className={`flex w-full items-center gap-2 ${big ? "flex-col" : ""}`}>
+        <AudioPlayer src={preview} label={`Play · ${time}`} big={big} />
+        <div className="flex w-full gap-2">
+          <button type="button" onClick={() => { setPreview(null); void start(); }} className={`flex items-center justify-center gap-2 rounded-full border bg-card font-semibold ${btn}`}>
+            <RotateCcw className="h-5 w-5" /> Re-record
+          </button>
+          <button type="button" onClick={() => { onDone(preview); setPreview(null); }} className={`flex items-center justify-center gap-2 rounded-full bg-success font-semibold text-primary-foreground ${btn}`}>
+            <Check className="h-5 w-5" /> Send
+          </button>
+        </div>
+      </div>
+    );
+
   return (
     <div className="flex flex-col items-center gap-2">
       <button
@@ -154,11 +184,11 @@ export function Recorder({ onDone, big, label = "Hold to talk" }: { onDone: (dat
         onClick={rec ? stop : start}
         className={`flex items-center justify-center gap-3 rounded-full font-semibold shadow-warm transition ${
           rec ? "animate-pulse bg-destructive text-destructive-foreground" : "bg-primary text-primary-foreground"
-        } ${big ? "w-full py-6 text-xl" : "h-12 w-12"}`}
+        } ${big ? "w-full py-6 text-xl" : "h-12 min-w-12 px-3"}`}
         aria-label={rec ? "Stop recording" : "Record voice"}
       >
         {rec ? <Square className={big ? "h-7 w-7" : "h-5 w-5"} /> : <Mic className={big ? "h-8 w-8" : "h-5 w-5"} />}
-        {big && (rec ? "Tap to stop" : label)}
+        {rec ? <span>{big ? `Recording ${time}` : time}</span> : big && label}
       </button>
       {err && <p className="text-xs text-destructive">{err}</p>}
     </div>
