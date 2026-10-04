@@ -9,7 +9,7 @@ import cookingImg from "@/assets/impact-cooking.jpg";
 import communityImg from "@/assets/impact-community.jpg";
 import { AudioPlayer, Shell } from "@/components/rooted";
 import { LanguageWelcome } from "@/components/language-welcome";
-import { speakTranslation } from "@/lib/voice.functions";
+import { speakTranslation, translateText } from "@/lib/voice.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -31,26 +31,46 @@ const STORY =
 function HearStory() {
   const [audio, setAudio] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  if (audio) return <AudioPlayer big src={audio} label="Play Noor's story" />;
+  const [failed, setFailed] = useState(false);
+  const [lang, setLang] = useState<"English" | "Swahili">("English");
+  const langPick = (
+    <div className="mb-2 flex gap-2" role="group" aria-label="Story language">
+      {(["English", "Swahili"] as const).map((l) => (
+        <button key={l} type="button" aria-pressed={lang === l} onClick={() => { setLang(l); setAudio(null); setFailed(false); }} className={`rounded-full px-4 py-2 text-sm font-semibold ${lang === l ? "bg-primary text-primary-foreground" : "border bg-card"}`}>
+          {l === "Swahili" ? "Kiswahili" : "English"}
+        </button>
+      ))}
+    </div>
+  );
+  if (audio) return <div>{langPick}<AudioPlayer big src={audio} label={`Play Noor's story · ${lang === "Swahili" ? "Kiswahili" : "English"}`} /></div>;
   return (
+    <div>{langPick}
     <button
+      disabled={busy}
       onClick={async () => {
-        setBusy(true);
-        const r = await speakTranslation({ data: { text: STORY } }).catch(() => null);
+        setBusy(true); setFailed(false);
+        let text = STORY;
+        if (lang === "Swahili") {
+          const t = await translateText({ data: { text: STORY, targetLanguage: "Swahili" } }).catch(() => null);
+          if (!t?.ok || !t.text) { setBusy(false); setFailed(true); return; }
+          text = t.text;
+        }
+        const r = await speakTranslation({ data: { text } }).catch(() => null);
         setBusy(false);
         if (r?.ok) {
           setAudio(r.audio);
           new Audio(r.audio).play().catch(() => {});
-        }
+        } else setFailed(true);
       }}
       className="flex w-full items-center gap-4 rounded-3xl border bg-card p-5 text-left shadow-warm"
     >
       {busy ? <Loader2 className="h-8 w-8 animate-spin text-secondary" /> : <Mic className="h-8 w-8 text-secondary" />}
       <span>
         <span className="block text-lg font-semibold">Hear Noor's Story</span>
-        <span className="text-xs text-muted-foreground">Read aloud by a narrator, not Noor's own voice</span>
+        <span className="text-xs text-muted-foreground">{busy ? "Preparing the story…" : failed ? "Couldn't play right now — tap to try again" : `AI narrator${lang === "Swahili" ? ", translated by AI" : ""} — not Noor's own voice`}</span>
       </span>
     </button>
+    </div>
   );
 }
 
