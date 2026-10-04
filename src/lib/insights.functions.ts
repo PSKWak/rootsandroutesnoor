@@ -25,9 +25,8 @@ export const summarizeFeedback = createServerFn({ method: "POST" })
       body: JSON.stringify({
         model: "openai/gpt-6-astra",
         instructions:
-          "You help a coffee farmer (Noor) understand visitor feedback. Use ONLY the feedback given. Write very simple words. Return JSON: {\"cards\":[...]} with exactly 4 cards, kinds love, wish, recurring, next (one each). Each: title (max 6 words), explanation (one short sentence), mentions (exact count of feedback items supporting it), example (short quote copied from feedback, optional). For 'next', give a gentle suggestion. Never exaggerate; if evidence is thin say so.",
+          "Reply with only a JSON object, no markdown. You help a coffee farmer (Noor) understand visitor feedback. Use ONLY the feedback given. Write very simple words. Return JSON: {\"cards\":[...]} with exactly 4 cards, kinds love, wish, recurring, next (one each). Each: title (max 6 words), explanation (one short sentence), mentions (exact count of feedback items supporting it), example (short quote copied from feedback, optional). For 'next', give a gentle suggestion. Never exaggerate; if evidence is thin say so.",
         input: `Visitor feedback (return json):\n${list || "(no feedback)"}`,
-        text: { format: { type: "json_object" } },
       }),
     });
     if (!r.ok) {
@@ -37,7 +36,7 @@ export const summarizeFeedback = createServerFn({ method: "POST" })
     const j = (await r.json()) as { output_text?: string; output?: { content?: { text?: string }[] }[] };
     const txt = j.output_text ?? j.output?.flatMap((o) => o.content ?? []).map((c) => c.text ?? "").join("") ?? "";
     try {
-      const parsed = z.object({ cards: z.array(Card) }).parse(JSON.parse(txt));
+      const parsed = z.object({ cards: z.array(Card) }).parse(JSON.parse(txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1)));
       return { ok: true as const, cards: parsed.cards };
     } catch (e) {
       console.error("insights parse", e, txt);
