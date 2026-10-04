@@ -74,11 +74,20 @@ export const TRANSPORT = {
   pickupFrom: "[Pickup point — to be confirmed]",
 };
 
+/** Confirmed by Noor: the farm is 2 hectares and a visit covers about 1 km on foot. */
+export const FARM_SIZE = {
+  hectares: 2,
+  walkingKm: 1,
+};
+
 export const TERRAIN = [
   { icon: "🥾", label: "Terrain", value: "[To be confirmed] — may be uneven or steep in some areas" },
   { icon: "🌧️", label: "Rain", value: "Paths may become muddy in rainy months" },
-  { icon: "🚶", label: "Walking", value: "[Walking distance to be confirmed]" },
-  { icon: "🌦️", label: "Weather", value: "[To be confirmed] — highland mornings can be cool; bring a light jacket" },
+  {
+    icon: "🚶",
+    label: "Walking",
+    value: `About ${FARM_SIZE.walkingKm} km of walking across the ${FARM_SIZE.hectares}-hectare farm`,
+  },
   { icon: "👟", label: "Recommended footwear", value: "Comfortable walking shoes" },
   { icon: "ℹ️", label: "Accessibility", value: "[To be confirmed] — some areas may have limited accessibility" },
 ];
