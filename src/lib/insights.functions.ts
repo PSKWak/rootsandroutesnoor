@@ -26,7 +26,7 @@ export const summarizeFeedback = createServerFn({ method: "POST" })
         model: "openai/gpt-6-astra",
         instructions:
           "You help a coffee farmer (Noor) understand visitor feedback. Use ONLY the feedback given. Write very simple words. Return JSON: {\"cards\":[...]} with exactly 4 cards, kinds love, wish, recurring, next (one each). Each: title (max 6 words), explanation (one short sentence), mentions (exact count of feedback items supporting it), example (short quote copied from feedback, optional). For 'next', give a gentle suggestion. Never exaggerate; if evidence is thin say so.",
-        input: list || "(no feedback)",
+        input: `Visitor feedback (return json):\n${list || "(no feedback)"}`,
         text: { format: { type: "json_object" } },
       }),
     });
