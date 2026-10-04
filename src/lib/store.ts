@@ -41,7 +41,18 @@ export type State = {
   sms: Sms[];
   visitorLanguage: string;
   pickups: PickupRequest[];
+  /** Noor's choice for each suggested action, keyed by the action text. */
+  insightActions: Record<string, ActionChoice>;
 };
+export type ActionChoice = "trying" | "done" | "later";
+export function setInsightAction(action: string, choice: ActionChoice | null) {
+  set((s) => {
+    const next = { ...(s.insightActions ?? {}) };
+    if (choice) next[action] = choice;
+    else delete next[action];
+    return { ...s, insightActions: next };
+  });
+}
 
 /** A request only. Never auto-confirmed — Noor arranges transport herself. */
 export type PickupRequest = {
@@ -69,6 +80,7 @@ const seed = (): State => ({
   bookings: [],
   sms: [],
   pickups: [],
+  insightActions: {},
   visitorLanguage: "English",
   feedback: [
     { id: "f1", rating: 5, text: "Meeting Noor was the highlight. She explained coffee processing so patiently.", tags: ["Meeting Noor", "Coffee"], at: Date.UTC(2026, 8, 2) },
@@ -283,15 +295,15 @@ export function submitFeedback(f: Omit<Feedback, "id" | "at">) {
 }
 
 const THEMES = [
-  { label: "mentioned meeting Noor", match: (f: Feedback) => f.tags.includes("Meeting Noor") || /noor/i.test(f.text ?? "") },
-  { label: "mentioned coffee processing", match: (f: Feedback) => /process|washing|drying/i.test(f.text ?? "") },
-  { label: "asked about roasting", match: (f: Feedback) => /roast/i.test(f.text ?? "") },
-  { label: "enjoyed the farm walk", match: (f: Feedback) => f.tags.includes("Farm walk") || /walk/i.test(f.text ?? "") },
-  { label: "mentioned community or family", match: (f: Feedback) => f.tags.includes("Community") || /family|community/i.test(f.text ?? "") },
+  { label: "mentioned meeting Noor", action: "Keep sharing your family story with guests", match: (f: Feedback) => f.tags.includes("Meeting Noor") || /noor/i.test(f.text ?? "") },
+  { label: "mentioned coffee processing", action: "Let guests try washing and drying beans", match: (f: Feedback) => /process|washing|drying/i.test(f.text ?? "") },
+  { label: "asked about roasting", action: "Show guests how you roast coffee", match: (f: Feedback) => /roast/i.test(f.text ?? "") },
+  { label: "enjoyed the farm walk", action: "Offer the walk early in the morning", match: (f: Feedback) => f.tags.includes("Farm walk") || /walk/i.test(f.text ?? "") },
+  { label: "mentioned community or family", action: "Invite family to join the visit", match: (f: Feedback) => f.tags.includes("Community") || /family|community/i.test(f.text ?? "") },
 ];
 
 export function feedbackThemes(list: Feedback[]) {
-  return THEMES.map((t) => ({ label: t.label, count: list.filter(t.match).length }))
+  return THEMES.map((t) => ({ label: t.label, action: t.action, count: list.filter(t.match).length }))
     .filter((t) => t.count > 0)
     .sort((a, b) => b.count - a.count);
 }

@@ -11,3 +11,4 @@
 - [x] Experience: removed the numbered Cherry → Pulp & Wash → Sun Dry → Roast & Share list (user request); "This Cup Has a Story" keeps the Growing → Your Cup journey — do not re-add
 - [x] "This Cup Has a Story": animated flow — each step pops in one after another, connector lines draw downward with a drop travelling along them, the cup step glows; frozen until scrolled into view, fully still under reduced motion
 
+- [x] Insights → simple actions Noor can mark I'll try / Done / Later
