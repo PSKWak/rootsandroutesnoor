@@ -113,7 +113,7 @@ function Insights() {
                 {c.action && <ActionBox action={c.action} />}
               </div>
             ))
-          : !q.isLoading && (
+          : (
               <ul className="space-y-3">
                 {themes.map((t) => (
                   <li key={t.label} className="space-y-3 rounded-3xl border bg-card p-5">
