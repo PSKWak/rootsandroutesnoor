@@ -141,3 +141,14 @@
   h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; }
 }
 @utility bg-earth-fade { background-image: var(--gradient-earth); }
+
+/* Journey motion is optional: honour reduced-motion preferences. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise-in,
+  .animate-bob,
+  .animate-arrow-drop {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
