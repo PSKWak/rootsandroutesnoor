@@ -165,7 +165,7 @@ export function Recorder({ onDone, big, label = "Record" }: { onDone: (dataUrl: 
   if (preview)
     return (
       <div className={`flex w-full items-center gap-2 ${big ? "flex-col" : ""}`}>
-        <AudioPlayer src={preview} label={`Play · ${time}`} big={big} />
+        <AudioPlayer src={preview} label={`Play · ${time}`} big={!!big} />
         <div className="flex w-full gap-2">
           <button type="button" onClick={() => { setPreview(null); void start(); }} className={`flex items-center justify-center gap-2 rounded-full border bg-card font-semibold ${btn}`}>
             <RotateCcw className="h-5 w-5" /> Re-record
