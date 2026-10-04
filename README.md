@@ -73,6 +73,55 @@ Noor doesn't need a new phone, a new app or new skills. The AI adapts to her.
 
 ---
 
+## How it works
+
+```mermaid
+flowchart TB
+    V["Visitor<br/><small>Any language, own phone</small>"]
+    N["Noor (host)<br/><small>Swahili, demo PIN</small>"]
+
+    subgraph APP["Web app on the phone"]
+        VS["Visitor screens<br/><small>Home, ask, book, feedback</small>"]
+        NS["Noor screens<br/><small>Inbox, visits, insights, SMS</small>"]
+        ST["Local store (store.ts)<br/><small>Saved on the phone, synced when online</small>"]
+    end
+
+    subgraph SRV["Server functions · API keys never leave the server"]
+        VF["voice.functions<br/><small>Voice, translation</small>"]
+        IF["insights.functions<br/><small>4 insight cards</small>"]
+        DF["digest.functions<br/><small>Swahili SMS summary</small>"]
+    end
+
+    EL["ElevenLabs<br/><small>Speech-to-text, read-aloud</small>"]
+    AI["Lovable AI gateway<br/><small>Language model</small>"]
+    BP["Noor's basic phone<br/><small>SMS via sms: link</small>"]
+
+    V --> VS
+    N --> NS
+    VS --> ST
+    NS --> ST
+    ST -- when online --> SRV
+    VF --> EL
+    VF --> AI
+    IF --> AI
+    DF --> AI
+    NS -- sms: link --> BP
+
+    classDef people fill:#F1EFE8,stroke:#5F5E5A,color:#2C2C2A
+    classDef code fill:#EEEDFE,stroke:#534AB7,color:#3C3489
+    classDef ext fill:#E1F5EE,stroke:#0F6E56,color:#085041
+    class V,N,BP people
+    class VS,NS,ST,VF,IF,DF code
+    class EL,AI ext
+```
+
+<sub>Purple: our code · Teal: external AI service · Gray: people and devices</sub>
+
+1. A visitor asks a question on their phone. It's saved on the device first, so nothing is lost without signal.
+2. When online, a server function sends it to the AI to be translated into Swahili. API keys stay on the server.
+3. Noor reads or listens to it and replies. Her reply is translated back and checked before the visitor sees it.
+4. Visitor feedback becomes insight cards and a short Swahili SMS, sent to Noor's basic phone from the phone's own messages app.
+
 ## Tech stack
 
 - **App:** React and TypeScript (TanStack Start), Tailwind CSS, shadcn/ui
