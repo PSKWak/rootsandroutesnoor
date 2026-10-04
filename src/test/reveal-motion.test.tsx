@@ -65,4 +65,55 @@ describe("coffee journey reveal motion", () => {
     );
     expect(wrapperOf("Harvesting").className).toContain("animate-rise-in");
   });
+
+  it("holds the sequence frozen until the block scrolls into view", () => {
+    mockPrefersReducedMotion(false);
+    (globalThis as unknown as Record<string, unknown>)["IntersectionObserver"] = class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    };
+    render(
+      <Reveal anim="animate-none">
+        <p className="seq animate-pop-in">Processing</p>
+      </Reveal>,
+    );
+    const box = screen.getByText("Processing").closest("[data-shown]")!;
+    expect(box.getAttribute("data-shown")).toBe("false");
+    expect(box.className).toContain("opacity-0");
+  });
+
+  it("releases the sequence and applies the requested entrance animation", () => {
+    mockPrefersReducedMotion(false);
+    (globalThis as unknown as Record<string, unknown>)["IntersectionObserver"] = class {
+      cb: (entries: { isIntersecting: boolean }[]) => void;
+      constructor(cb: (entries: { isIntersecting: boolean }[]) => void) {
+        this.cb = cb;
+      }
+      observe() {
+        this.cb([{ isIntersecting: true }]);
+      }
+      unobserve() {}
+      disconnect() {}
+    };
+    render(
+      <Reveal anim="animate-none">
+        <p className="seq animate-pop-in">Processing</p>
+      </Reveal>,
+    );
+    const box = screen.getByText("Processing").closest("[data-shown]")!;
+    expect(box.getAttribute("data-shown")).toBe("true");
+    expect(box.className).toContain("animate-none");
+    expect(box.className).not.toContain("opacity-0");
+  });
+
+  it("releases the sequence immediately when the visitor prefers reduced motion", () => {
+    mockPrefersReducedMotion(true);
+    render(
+      <Reveal anim="animate-none">
+        <p className="seq animate-pop-in">Roasting</p>
+      </Reveal>,
+    );
+    expect(screen.getByText("Roasting").closest("[data-shown]")!.getAttribute("data-shown")).toBe("true");
+  });
 });

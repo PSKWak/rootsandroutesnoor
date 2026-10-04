@@ -43,7 +43,7 @@ function Experience() {
                 return (
                   <li key={s.t}>
                     <div className="flex items-start gap-3">
-                      <span className="relative flex h-8 w-8 shrink-0 items-center justify-center">
+                      <span className="relative flex h-9 w-8 shrink-0 items-center justify-center">
                         <span className="seq relative block animate-pop-in text-2xl" style={{ animationDelay: `${i * 240}ms` }} aria-hidden="true">
                           {last && <span className="flow-halo seq absolute -inset-2 rounded-full bg-primary animate-halo" />}
                           <span className="seq block animate-bob" style={{ animationDelay: `${i * 420}ms` }}>{s.e}</span>
@@ -58,7 +58,7 @@ function Experience() {
                       <div className="relative ml-[15px] h-7 w-0.5" aria-hidden="true">
                         <span className="seq absolute inset-0 origin-top animate-flow-segment bg-primary/25" style={{ animationDelay: `${i * 240 + 150}ms` }} />
                         <span className="flow-drip seq absolute left-1/2 top-0 h-1.5 w-1.5 rounded-full bg-primary animate-drip" style={{ animationDelay: `${i * 240 + 430}ms` }} />
-                        <span className="seq absolute -bottom-1 left-1/2 animate-chev text-[10px] leading-none text-primary" style={{ animationDelay: `${i * 240 + 430}ms` }}>▾</span>
+                        <span className="seq absolute bottom-0 left-1/2 animate-chev text-[10px] leading-none text-primary" style={{ animationDelay: `${i * 240 + 430}ms` }}>▾</span>
                       </div>
                     )}
                   </li>
