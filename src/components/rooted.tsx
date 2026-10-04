@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Check, CheckCheck, Clock, AlertCircle, Mic, Square, Play, Pause, Home, MessageCircle, CalendarDays, Star, Sprout, Loader2, Languages, RotateCcw } from "lucide-react";
+import { Check, CheckCheck, Clock, AlertCircle, Mic, Square, Play, Pause, Home, MessageCircle, CalendarDays, Star, Sprout, Loader2, Languages, RotateCcw, Lightbulb } from "lucide-react";
 import type { BookingStatus, MsgStatus } from "@/lib/store";
 
 export function Shell({ children, title, back }: { children: ReactNode; title?: string; back?: string }) {
@@ -45,25 +45,31 @@ function OnlineDot() {
 
 function VisitorNav() {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  if (path.startsWith("/noor")) return null;
-  const items = [
-    { to: "/", icon: Home, label: "Discover" },
-    { to: "/chat", icon: MessageCircle, label: "Ask" },
-    { to: "/book", icon: CalendarDays, label: "Book" },
-    { to: "/feedback", icon: Star, label: "Feedback" },
-    { to: "/noor", icon: Sprout, label: "Noor" },
-  ] as const;
+  const noor = path.startsWith("/noor");
+  const items = noor
+    ? ([
+        { to: "/noor", icon: Home, label: "Overview" },
+        { to: "/noor/insights", icon: Lightbulb, label: "Insights" },
+        { to: "/noor/inbox", icon: MessageCircle, label: "Messages" },
+        { to: "/noor/bookings", icon: CalendarDays, label: "Experiences" },
+      ] as const)
+    : ([
+        { to: "/", icon: Home, label: "Home" },
+        { to: "/experience", icon: Sprout, label: "Experience" },
+        { to: "/chat", icon: MessageCircle, label: "Ask Noor" },
+        { to: "/feedback", icon: Star, label: "Feedback" },
+      ] as const);
   return (
     <nav className="fixed inset-x-0 bottom-0 z-20 mx-auto flex max-w-md justify-around border-t bg-card/95 py-2 backdrop-blur">
       {items.map(({ to, icon: Icon, label }) => (
         <Link
           key={to}
           to={to}
-          activeOptions={{ exact: to === "/" }}
-          className="flex min-w-14 flex-col items-center gap-0.5 rounded-xl px-2 py-1 text-xs text-muted-foreground"
+          activeOptions={{ exact: to === "/" || to === "/noor" }}
+          className="flex min-w-16 flex-col items-center gap-0.5 rounded-xl px-2 py-1 text-xs text-muted-foreground"
           activeProps={{ className: "text-primary font-semibold" }}
         >
-          <Icon className="h-5 w-5" />
+          <Icon className="h-6 w-6" />
           {label}
         </Link>
       ))}
@@ -188,7 +194,7 @@ export function Recorder({ onDone, big, label = "Record" }: { onDone: (dataUrl: 
         aria-label={rec ? "Stop recording" : "Record voice"}
       >
         {rec ? <Square className={big ? "h-7 w-7" : "h-5 w-5"} /> : <Mic className={big ? "h-8 w-8" : "h-5 w-5"} />}
-        {rec ? <span>{big ? `Recording ${time}` : time}</span> : big && label}
+        {rec ? <span>{big ? `Listening… ${time}` : time}</span> : big && label}
       </button>
       {err && <p className="text-xs text-destructive">{err}</p>}
     </div>

@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#8a3b1f" },
-      { title: "Rooted — Meet the people behind the place" },
+      { title: "Roots & Routes" },
       { name: "description", content: "Community tourism connecting travelers with local hosts." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

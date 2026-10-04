@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Mail, CalendarCheck, MessageCircle, Heart, Lightbulb, Smartphone } from "lucide-react";
+import { Mail, CalendarCheck, Lightbulb, Smartphone } from "lucide-react";
 import noor from "@/assets/noor.jpg";
 import { Shell } from "@/components/rooted";
 import { resetDemo, useStore } from "@/lib/store";
@@ -13,9 +13,7 @@ function Dashboard() {
   const tiles = [
     { to: "/noor/inbox", icon: Mail, label: "New enquiries", n: newEnq, cls: "bg-primary text-primary-foreground" },
     { to: "/noor/bookings", icon: CalendarCheck, label: "Booking requests", n: pending, cls: "bg-secondary text-secondary-foreground" },
-    { to: "/noor/inbox", icon: MessageCircle, label: "Messages", n: 0, cls: "bg-card" },
-    { to: "/noor/insights", icon: Heart, label: "Visitor feedback", n: 0, cls: "bg-card" },
-    { to: "/noor/insights", icon: Lightbulb, label: "Insights", n: 0, cls: "bg-accent text-accent-foreground" },
+    { to: "/noor/insights", icon: Lightbulb, label: "Visitor insights", n: 0, cls: "bg-accent text-accent-foreground" },
   ] as const;
   return (
     <Shell>

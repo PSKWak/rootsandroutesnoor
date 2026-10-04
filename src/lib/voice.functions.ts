@@ -54,3 +54,21 @@ export const processVoice = createServerFn({ method: "POST" })
     const translated = j.output_text ?? j.output?.flatMap((o) => o.content ?? []).map((c) => c.text ?? "").join("") ?? "";
     return { ok: true as const, transcript, translated: translated.trim() };
   });
+
+/** Reads a translated text aloud (ElevenLabs TTS). Used only for translations — never as Noor's voice. */
+export const speakTranslation = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({ text: z.string().min(1).max(1500) }).parse(d))
+  .handler(async ({ data }) => {
+    const key = process.env["ELEVENLABS_API_KEY"];
+    if (!key) return { ok: false as const, error: "Voice service is not connected." };
+    const r = await fetch("https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL?output_format=mp3_44100_128", {
+      method: "POST",
+      headers: { "xi-api-key": key, "Content-Type": "application/json" },
+      body: JSON.stringify({ text: data.text, model_id: "eleven_multilingual_v2" }),
+    });
+    if (!r.ok) {
+      console.error("TTS failed", r.status, await r.text());
+      return { ok: false as const, error: `Read-aloud failed (${r.status}).` };
+    }
+    return { ok: true as const, audio: `data:audio/mpeg;base64,${Buffer.from(await r.arrayBuffer()).toString("base64")}` };
+  });

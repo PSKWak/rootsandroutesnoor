@@ -2,14 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { AudioPlayer, Recorder, Shell } from "@/components/rooted";
-import { FEEDBACK_TAGS, SMALL_SAMPLE, feedbackThemes, submitFeedback, useStore } from "@/lib/store";
+import { FEEDBACK_TAGS, submitFeedback } from "@/lib/store";
 
 export const Route = createFileRoute("/feedback")({
   head: () => ({
     meta: [
-      { title: "How was your visit? — Rooted" },
+      { title: "How was your visit? — Roots & Routes" },
       { name: "description", content: "Share text or voice feedback about your visit to Noor's farm." },
-      { property: "og:title", content: "Feedback — Rooted" },
+      { property: "og:title", content: "Feedback — Roots & Routes" },
       { property: "og:description", content: "Tell Noor how your experience went." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -18,21 +18,22 @@ export const Route = createFileRoute("/feedback")({
   component: FeedbackPage,
 });
 
+const PROMPTS = ["What did you enjoy most?", "What surprised you?", "What would you change?", "What would you tell another traveler?"];
+
 function FeedbackPage() {
-  const all = useStore((s) => s.feedback);
   const [rating, setRating] = useState(0);
   const [text, setText] = useState("");
   const [audio, setAudio] = useState<string>();
   const [tags, setTags] = useState<string[]>([]);
   const [done, setDone] = useState(false);
-  const themes = feedbackThemes(all);
 
   return (
     <Shell title="Feedback" back="/">
       {done ? (
         <div className="px-5 py-12 text-center">
           <h2 className="text-3xl font-semibold">Thank you</h2>
-          <p className="mt-2 text-muted-foreground">Noor will hear your words. It helps her plan future visits.</p>
+          <p className="mt-2 text-lg">Your feedback has been shared with Noor.</p>
+          <p className="mt-1 text-sm text-muted-foreground">It helps her shape future visits.</p>
           <button onClick={() => { setDone(false); setRating(0); setText(""); setAudio(undefined); setTags([]); }} className="mt-6 font-semibold text-primary">Leave another</button>
         </div>
       ) : (
@@ -53,6 +54,12 @@ function FeedbackPage() {
               </button>
             ))}
           </div>
+          <div className="flex flex-wrap gap-2">
+            {PROMPTS.map((p) => (
+              <button key={p} type="button" onClick={() => setText((t) => (t ? t + "\n" : "") + p + " ")} className="rounded-full bg-muted px-3 py-2 text-sm">{p}</button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">Write or speak in any language — it will be translated for Noor.</p>
           <textarea value={text} onChange={(e) => setText(e.target.value)} rows={4} placeholder="What stayed with you?" className="w-full rounded-2xl border bg-card p-4" />
           <div className="space-y-2">
             {audio ? <AudioPlayer src={audio} label="Your voice feedback" /> : <Recorder big label="Or record voice feedback" onDone={(a) => setAudio(a)} />}
@@ -72,14 +79,6 @@ function FeedbackPage() {
         </form>
       )}
 
-      <section className="mx-5 rounded-2xl bg-muted p-5">
-        <h2 className="text-lg font-semibold">What visitors mention</h2>
-        <p className="text-xs text-muted-foreground">Themes found by AI in {all.length} reviews</p>
-        <ul className="mt-3 space-y-1 text-sm">
-          {themes.map((t) => <li key={t.label}><b>{t.count} of {all.length}</b> {t.label}</li>)}
-        </ul>
-        {all.length < SMALL_SAMPLE && <p className="mt-3 text-xs text-muted-foreground">Small sample — these are early signals, not conclusions.</p>}
-      </section>
     </Shell>
   );
 }

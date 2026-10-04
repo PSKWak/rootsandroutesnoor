@@ -8,3 +8,8 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Project rules
+- App state lives in `src/lib/store.ts` (localStorage-backed external store); swap for a backend later without touching screens.
+- All ElevenLabs and AI calls go through server functions in `src/lib/*.functions.ts`; keys are never read in browser code.
+- Noor's own recordings are never replaced by synthetic voice; read-aloud is only for translations and must be labelled.
