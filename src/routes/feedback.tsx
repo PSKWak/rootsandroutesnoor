@@ -18,12 +18,13 @@ export const Route = createFileRoute("/feedback")({
   component: FeedbackPage,
 });
 
-const PROMPTS = ["What did you enjoy most?", "What surprised you?", "What would you change?", "What would you tell another traveler?"];
+const PROMPTS = ["What did you enjoy most?", "What surprised you?", "What could be better?", "Would you recommend this experience?"];
 
 function FeedbackPage() {
   const [rating, setRating] = useState(0);
   const [text, setText] = useState("");
   const [audio, setAudio] = useState<string>();
+  const [photo, setPhoto] = useState<string>();
   const [tags, setTags] = useState<string[]>([]);
   const [done, setDone] = useState(false);
 
@@ -33,8 +34,8 @@ function FeedbackPage() {
         <div className="px-5 py-12 text-center">
           <h2 className="text-3xl font-semibold">Thank you</h2>
           <p className="mt-2 text-lg">Your feedback has been shared with Noor.</p>
-          <p className="mt-1 text-sm text-muted-foreground">It helps her shape future visits.</p>
-          <button onClick={() => { setDone(false); setRating(0); setText(""); setAudio(undefined); setTags([]); }} className="mt-6 font-semibold text-primary">Leave another</button>
+          <p className="mt-1 text-sm text-muted-foreground">Your feedback helps Noor improve future experiences. If you're offline, it's saved on this phone.</p>
+          <button onClick={() => { setDone(false); setRating(0); setText(""); setAudio(undefined); setPhoto(undefined); setTags([]); }} className="mt-6 font-semibold text-primary">Leave another</button>
         </div>
       ) : (
         <form
@@ -42,7 +43,7 @@ function FeedbackPage() {
           onSubmit={(e) => {
             e.preventDefault();
             if (!rating) return;
-            submitFeedback({ rating, tags, ...(text ? { text } : {}), ...(audio ? { audio } : {}) });
+            submitFeedback({ rating, tags, ...(text ? { text } : {}), ...(audio ? { audio } : {}), ...(photo ? { photo } : {}) });
             setDone(true);
           }}
         >
@@ -64,6 +65,24 @@ function FeedbackPage() {
           <div className="space-y-2">
             {audio ? <AudioPlayer src={audio} label="Your voice feedback" /> : <Recorder big label="Or record voice feedback" onDone={(a) => setAudio(a)} />}
           </div>
+          <label className="flex min-h-14 cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-dashed bg-card font-semibold">
+            📷 {photo ? "Change photo" : "Add a photo (optional)"}
+            <input type="file" accept="image/*" className="sr-only" onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (!f) return;
+              const img = new Image();
+              img.onload = () => {
+                const c = document.createElement("canvas");
+                const k = Math.min(1, 800 / Math.max(img.width, img.height));
+                c.width = img.width * k; c.height = img.height * k;
+                c.getContext("2d")?.drawImage(img, 0, 0, c.width, c.height);
+                setPhoto(c.toDataURL("image/jpeg", 0.7));
+                URL.revokeObjectURL(img.src);
+              };
+              img.src = URL.createObjectURL(f);
+            }} />
+          </label>
+          {photo && <img src={photo} alt="Your photo from the visit" className="max-h-48 w-full rounded-2xl object-cover" />}
           <div className="flex flex-wrap gap-2">
             {FEEDBACK_TAGS.map((t) => {
               const on = tags.includes(t);
