@@ -44,3 +44,7 @@
 - [ ] Real farm details from Noor (blocked: waiting on Noor)
 - [x] Getting here filled in with Noor's detail: 2-hectare farm, about 1 km of walking; weather row removed from Know before you go
 - [ ] Still placeholder in Getting here / Know before you go (blocked: waiting on Noor): nearest town, farm location, transport routes, pickup point, terrain, accessibility
+
+## APK build (2026-10-11)
+- [x] Built signed RootsAndRoutes.apk (TWA-style WebView wrapper, package app.rootsroutes, minSdk 23 / targetSdk 34) — loads the published site; publish before sharing the APK so it shows the latest changes
+- Signing keystore kept at roots-signing.keystore (alias roots, storepass rootsroutes2026) — needed for future APK updates
